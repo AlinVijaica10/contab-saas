@@ -3,7 +3,9 @@ import { Login } from './components/login/login';
 import { Register } from './components/register/register';
 import { ClientList } from './components/client-list/client-list';
 import { ClientForm } from './components/client-form/client-form';
+import { InvoiceList } from './components/invoice-list/invoice-list';
 import { authGuard } from './guards/auth-guard';
+import { InvoiceForm } from './components/invoice-form/invoice-form';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/clients', pathMatch: 'full' },
@@ -12,4 +14,6 @@ export const routes: Routes = [
   { path: 'clients', component: ClientList, canActivate: [authGuard] },
   { path: 'clients/add', component: ClientForm, canActivate: [authGuard] },
   { path: 'clients/edit/:id', component: ClientForm, canActivate: [authGuard] },
+  { path: 'invoices', component: InvoiceList, canActivate: [authGuard] },
+  { path: 'invoices/add', component: InvoiceForm, canActivate: [authGuard] },
 ];

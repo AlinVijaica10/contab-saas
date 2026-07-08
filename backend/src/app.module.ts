@@ -4,9 +4,20 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ClientsModule } from './clients/clients.module';
+import { ClsModule } from 'nestjs-cls';
+import { InvoicesModule } from './invoices/invoices.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ClientsModule],
+  imports: [
+    ClsModule.forRoot({
+      global: true,
+      middleware: { mount: true },
+    }),
+    PrismaModule,
+    AuthModule,
+    ClientsModule,
+    InvoicesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

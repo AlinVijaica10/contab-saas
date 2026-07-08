@@ -1,0 +1,47 @@
+<div class="invoice-list">
+  <div class="header">
+    <h2>Facturile mele</h2>
+    <a routerLink="/invoices/add" class="btn-add">+ Factură nouă</a>
+  </div>
+
+  @if (loading()) {
+    <p>Se încarcă...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!loading() && !error() && invoices().length === 0) {
+    <p>Nu ai facturi încă.</p>
+  }
+
+  @if (invoices().length > 0) {
+    <table>
+      <thead>
+      <tr>
+        <th>Serie/Număr</th>
+        <th>Client</th>
+        <th>Data emiterii</th>
+        <th>Status</th>
+        <th>Total</th>
+        <th>Acțiuni</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (invoice of invoices(); track invoice.id) {
+          <tr>
+            <td>{{ formatInvoiceNumber(invoice) }}</td>
+            <td>{{ invoice.client?.companyName || '-' }}</td>
+            <td>{{ invoice.issueDate | date: 'dd.MM.yyyy' }}</td>
+            <td>{{ invoice.status }}</td>
+            <td>{{ invoice.total }} {{ invoice.currency }}</td>
+            <td class="actions">
+              <button (click)="downloadPdf(invoice.id)">Descarcă PDF</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

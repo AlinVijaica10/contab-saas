@@ -1,0 +1,105 @@
+.invoice-form {
+  max-width: 800px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+
+.field {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  font-weight: 500;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr 1fr auto;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.field.small input {
+  width: 100%;
+}
+
+.line-total {
+  font-weight: 600;
+  padding: 8px 0;
+  text-align: right;
+}
+
+.btn-remove {
+  background: #c0392b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.btn-add-line {
+  background: #2c3e50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.totals {
+  width: 300px;
+  margin-left: auto;
+  margin-bottom: 20px;
+}
+
+.totals div {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.totals .grand-total {
+  font-weight: bold;
+  font-size: 16px;
+  border-top: 2px solid #222;
+  padding-top: 8px;
+}
+
+.error {
+  color: #c0392b;
+  font-weight: 500;
+}
+
+button[type="submit"] {
+  background: #2c3e50;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
