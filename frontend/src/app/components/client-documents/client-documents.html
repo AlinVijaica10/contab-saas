@@ -1,0 +1,47 @@
+<div class="client-documents">
+  <div class="header">
+    <div>
+      <a routerLink="/clients" class="back-link">← Înapoi la clienți</a>
+      <h2>Documente — {{ clientName() }}</h2>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p>Se încarcă...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!loading() && !error() && documents().length === 0) {
+    <p>Nu au fost încărcate documente încă.</p>
+  }
+
+  @if (documents().length > 0) {
+    <table>
+      <thead>
+      <tr>
+        <th>Nume fișier</th>
+        <th>Categorie</th>
+        <th>Mărime</th>
+        <th>Data încărcării</th>
+        <th>Acțiuni</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (doc of documents(); track doc.id) {
+          <tr>
+            <td>{{ doc.originalName }}</td>
+            <td>{{ categoryLabels[doc.category] || doc.category }}</td>
+            <td>{{ formatSize(doc.size) }}</td>
+            <td>{{ doc.uploadedAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+            <td class="actions">
+              <button (click)="download(doc)">Descarcă</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

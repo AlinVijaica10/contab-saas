@@ -6,6 +6,9 @@ import { ClientForm } from './components/client-form/client-form';
 import { InvoiceList } from './components/invoice-list/invoice-list';
 import { authGuard } from './guards/auth-guard';
 import { InvoiceForm } from './components/invoice-form/invoice-form';
+import { PublicUpload } from './components/public-upload/public-upload';
+import { ClientDocuments } from './components/client-documents/client-documents';
+
 
 export const routes: Routes = [
   { path: '', redirectTo: '/clients', pathMatch: 'full' },
@@ -16,4 +19,6 @@ export const routes: Routes = [
   { path: 'clients/edit/:id', component: ClientForm, canActivate: [authGuard] },
   { path: 'invoices', component: InvoiceList, canActivate: [authGuard] },
   { path: 'invoices/add', component: InvoiceForm, canActivate: [authGuard] },
+  { path: 'upload/:token', component: PublicUpload },
+  { path: 'clients/:id/documents', component: ClientDocuments, canActivate: [authGuard] },
 ];

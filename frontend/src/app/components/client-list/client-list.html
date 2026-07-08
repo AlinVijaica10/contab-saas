@@ -38,6 +38,10 @@
             <td>{{ client.status }}</td>
             <td class="actions">
               <a [routerLink]="['/clients/edit', client.id]">Editează</a>
+              <button (click)="copyUploadLink(client.id)" class="btn-link">
+                {{ copiedClientId() === client.id ? 'Copiat!' : 'Copiază link' }}
+              </button>
+              <a [routerLink]="['/clients', client.id, 'documents']">Documente</a>
               <button (click)="deleteClient(client.id)">Șterge</button>
             </td>
           </tr>

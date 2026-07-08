@@ -4,7 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { ClsService } from 'nestjs-cls';
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
 
-const TENANT_SCOPED_MODELS = ['Client', 'Invoice']; // adaugi aici orice model nou legat de un Tenant
+const TENANT_SCOPED_MODELS = ['Client', 'Invoice', 'Document', 'ClientUploadLink'];
 
 @Injectable()
 export class PrismaService

@@ -19,6 +19,8 @@ model Tenant {
   clients          Client[]
   invoiceSeries    InvoiceSeries[]
   invoices         Invoice[]
+  documents         Document[]
+  clientUploadLinks ClientUploadLink[]
 }
 
 model User {
@@ -43,6 +45,8 @@ model Client {
   status        String   @default("active")
   createdAt     DateTime @default(now())
   invoices      Invoice[]
+  documents        Document[]
+  uploadLink       ClientUploadLink?
 }
 
 model InvoiceSeries {
@@ -108,4 +112,40 @@ enum InvoiceStatus {
   ISSUED
   PAID
   CANCELLED
+}
+
+enum DocumentCategory {
+  INVOICE
+  BANK_STATEMENT
+  CONTRACT
+  OTHER
+}
+
+model Document {
+  id           Int              @id @default(autoincrement())
+  tenantId     Int
+  tenant       Tenant           @relation(fields: [tenantId], references: [id])
+
+  clientId     Int
+  client       Client           @relation(fields: [clientId], references: [id])
+
+  category     DocumentCategory @default(OTHER)
+  originalName String
+  storedName   String           // numele fișierului pe disc (randomizat, ca să evităm coliziuni)
+  mimeType     String
+  size         Int              // bytes
+
+  uploadedAt   DateTime         @default(now())
+}
+
+model ClientUploadLink {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  clientId  Int      @unique
+  client    Client   @relation(fields: [clientId], references: [id])
+
+  token     String   @unique @default(uuid())
+  createdAt DateTime @default(now())
 }

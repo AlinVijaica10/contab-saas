@@ -1,0 +1,82 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Res,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Body,
+  NotFoundException,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import type { Response } from 'express';
+import { createReadStream } from 'fs';
+import { existsSync } from 'fs';
+import { DocumentsService } from './documents.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UploadDocumentDto } from './dto/upload-document.dto';
+
+@Controller('documents')
+export class DocumentsController {
+  constructor(private readonly documentsService: DocumentsService) {}
+
+  // --- Rute autentificate (contabilul) ---
+
+  @UseGuards(JwtAuthGuard)
+  @Get('client/:clientId/upload-link')
+  async getUploadLink(@Param('clientId') clientId: string) {
+    return this.documentsService.getOrCreateUploadLink(+clientId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('client/:clientId/upload-link/regenerate')
+  async regenerateUploadLink(@Param('clientId') clientId: string) {
+    return this.documentsService.regenerateUploadLink(+clientId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('client/:clientId')
+  async listByClient(@Param('clientId') clientId: string) {
+    return this.documentsService.listByClient(+clientId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/download')
+  async download(@Param('id') id: string, @Res() res: Response) {
+    const { doc, filePath } = await this.documentsService.getFileForDownload(+id);
+
+    if (!existsSync(filePath)) {
+      throw new NotFoundException('Fișierul nu mai există pe disc.');
+    }
+
+    res.set({
+      'Content-Type': doc.mimeType,
+      'Content-Disposition': `attachment; filename="${doc.originalName}"`,
+    });
+
+    createReadStream(filePath).pipe(res);
+  }
+
+  // --- Rută publică (clientul, fără autentificare) ---
+
+  @Get('public/:token')
+  async getPublicInfo(@Param('token') token: string) {
+    const link = await this.documentsService.validateToken(token);
+    return {
+      clientName: link.client.companyName,
+    };
+  }
+
+  @Post('public/:token/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadPublic(
+    @Param('token') token: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: UploadDocumentDto,
+  ) {
+    return this.documentsService.uploadPublic(token, file, dto.category);
+  }
+}
+

@@ -1,12 +1,47 @@
-<nav>
+<div class="layout">
   @if (authService.isAuthenticated()) {
-    <a routerLink="/clients">Clienți</a> |
-    <a routerLink="/clients/add">Adaugă client</a>
-    <button (click)="logout()" class="logout-btn">Deconectare</button>
-  } @else {
-    <a routerLink="/login">Autentificare</a> |
-    <a routerLink="/register">Înregistrare</a>
-  }
-</nav>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>ContaSaaS</h1>
+      </div>
 
-<router-outlet></router-outlet>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-label">Clienți</span>
+          <a routerLink="/clients" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">👥</span> Toți clienții
+          </a>
+          <a routerLink="/clients/add" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">➕</span> Adaugă client
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Facturare</span>
+          <a routerLink="/invoices" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">📄</span> Toate facturile
+          </a>
+          <a routerLink="/invoices/add" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">➕</span> Factură nouă
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button (click)="logout()" class="logout-btn">
+          <span class="nav-icon">🚪</span> Deconectare
+        </button>
+      </div>
+    </aside>
+  }
+
+  <main class="content" [class.full-width]="!authService.isAuthenticated() || isPublicRoute()">
+    @if (!authService.isAuthenticated() && !isPublicRoute()) {
+      <nav class="auth-nav">
+        <a routerLink="/login">Autentificare</a> |
+        <a routerLink="/register">Înregistrare</a>
+      </nav>
+    }
+    <router-outlet></router-outlet>
+  </main>
+</div>

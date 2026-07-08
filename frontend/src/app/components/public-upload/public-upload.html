@@ -1,0 +1,49 @@
+<div class="public-upload">
+  @if (loading()) {
+    <p>Se încarcă...</p>
+  }
+
+  @if (error() && !loading()) {
+    <div class="card">
+      <p class="error">{{ error() }}</p>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    <div class="card">
+      <h2>Încarcă documente</h2>
+      <p class="subtitle">pentru <strong>{{ clientName() }}</strong></p>
+
+      @if (!success()) {
+        <div class="field">
+          <label>Tip document</label>
+          <select [(ngModel)]="category">
+            <option value="INVOICE">Factură</option>
+            <option value="BANK_STATEMENT">Extras de cont</option>
+            <option value="CONTRACT">Contract</option>
+            <option value="OTHER">Alt document</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Fișier</label>
+          <input type="file" (change)="onFileSelected($event)">
+        </div>
+
+        <button
+          (click)="onUpload()"
+          [disabled]="!selectedFile || uploading()"
+        >
+          {{ uploading() ? 'Se încarcă...' : 'Încarcă documentul' }}
+        </button>
+      }
+
+      @if (success()) {
+        <div class="success-message">
+          <p>✅ Document încărcat cu succes!</p>
+          <button (click)="uploadAnother()">Încarcă alt document</button>
+        </div>
+      }
+    </div>
+  }
+</div>

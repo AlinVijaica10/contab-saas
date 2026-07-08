@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ClientService, Client } from '../../services/client';
+import { DocumentService } from '../../services/document';
 
 @Component({
   selector: 'app-client-list',
@@ -12,8 +13,12 @@ export class ClientList implements OnInit {
   clients = signal<Client[]>([]);
   loading = signal(true);
   error = signal('');
+  copiedClientId = signal<number | null>(null);
 
-  constructor(private clientService: ClientService) {}
+  constructor(
+    private clientService: ClientService,
+    private documentService: DocumentService,
+  ) {}
 
   ngOnInit(): void {
     this.loadClients();
@@ -44,6 +49,22 @@ export class ClientList implements OnInit {
       },
       error: (err) => {
         alert('Nu am putut șterge clientul.');
+        console.error(err);
+      },
+    });
+  }
+
+  copyUploadLink(clientId: number): void {
+    this.documentService.getUploadLink(clientId).subscribe({
+      next: (link) => {
+        const url = `${window.location.origin}/upload/${link.token}`;
+        navigator.clipboard.writeText(url).then(() => {
+          this.copiedClientId.set(clientId);
+          setTimeout(() => this.copiedClientId.set(null), 2000);
+        });
+      },
+      error: (err) => {
+        alert('Nu am putut genera linkul de upload.');
         console.error(err);
       },
     });
