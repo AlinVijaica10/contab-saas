@@ -1,0 +1,43 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id                Int      @id @default(autoincrement())
+  name              String
+  cui               String?
+  email             String
+  subscriptionPlan  String   @default("trial")
+  createdAt         DateTime @default(now())
+  users             User[]
+  clients           Client[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("accountant")
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id            Int      @id @default(autoincrement())
+  tenantId      Int
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  companyName   String
+  cui           String?
+  contactEmail  String
+  contactPerson String?
+  status        String   @default("active")
+  createdAt     DateTime @default(now())
+}

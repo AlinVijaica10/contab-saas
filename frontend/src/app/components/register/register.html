@@ -1,0 +1,40 @@
+<div class="auth-form">
+  <h2>Creează cont firmă de contabilitate</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="tenantName">Nume firmă contabilitate *</label>
+      <input id="tenantName" type="text" formControlName="tenantName">
+    </div>
+
+    <div class="field">
+      <label for="tenantEmail">Email firmă *</label>
+      <input id="tenantEmail" type="email" formControlName="tenantEmail">
+    </div>
+
+    <div class="field">
+      <label for="userName">Numele tău *</label>
+      <input id="userName" type="text" formControlName="userName">
+    </div>
+
+    <div class="field">
+      <label for="userEmail">Emailul tău (pentru login) *</label>
+      <input id="userEmail" type="email" formControlName="userEmail">
+    </div>
+
+    <div class="field">
+      <label for="password">Parolă *</label>
+      <input id="password" type="password" formControlName="password">
+    </div>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+
+    <button type="submit" [disabled]="form.invalid || submitting">
+      {{ submitting ? 'Se creează...' : 'Creează cont' }}
+    </button>
+  </form>
+
+  <p class="switch-link">Ai deja cont? <a routerLink="/login">Autentifică-te</a></p>
+</div>

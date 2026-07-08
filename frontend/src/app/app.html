@@ -1,0 +1,12 @@
+<nav>
+  @if (authService.isAuthenticated()) {
+    <a routerLink="/clients">Clienți</a> |
+    <a routerLink="/clients/add">Adaugă client</a>
+    <button (click)="logout()" class="logout-btn">Deconectare</button>
+  } @else {
+    <a routerLink="/login">Autentificare</a> |
+    <a routerLink="/register">Înregistrare</a>
+  }
+</nav>
+
+<router-outlet></router-outlet>

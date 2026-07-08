@@ -1,0 +1,25 @@
+<div class="auth-form">
+  <h2>Autentificare</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="email">Email *</label>
+      <input id="email" type="email" formControlName="email">
+    </div>
+
+    <div class="field">
+      <label for="password">Parolă *</label>
+      <input id="password" type="password" formControlName="password">
+    </div>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+
+    <button type="submit" [disabled]="form.invalid || submitting">
+      {{ submitting ? 'Se autentifică...' : 'Autentificare' }}
+    </button>
+  </form>
+
+  <p class="switch-link">Nu ai cont? <a routerLink="/register">Creează unul</a></p>
+</div>

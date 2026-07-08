@@ -1,0 +1,41 @@
+<div class="client-form">
+  <h2>{{ isEditMode ? 'Editează client' : 'Adaugă client' }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="companyName">Nume firmă *</label>
+      <input id="companyName" type="text" formControlName="companyName">
+    </div>
+
+    <div class="field">
+      <label for="cui">CUI</label>
+      <input id="cui" type="text" formControlName="cui">
+    </div>
+
+    <div class="field">
+      <label for="contactEmail">Email contact *</label>
+      <input id="contactEmail" type="email" formControlName="contactEmail">
+    </div>
+
+    <div class="field">
+      <label for="contactPerson">Persoană de contact</label>
+      <input id="contactPerson" type="text" formControlName="contactPerson">
+    </div>
+
+    <div class="field">
+      <label for="status">Status</label>
+      <select id="status" formControlName="status">
+        <option value="active">Activ</option>
+        <option value="inactive">Inactiv</option>
+      </select>
+    </div>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+
+    <button type="submit" [disabled]="form.invalid || submitting">
+      {{ submitting ? 'Se salvează...' : 'Salvează' }}
+    </button>
+  </form>
+</div>

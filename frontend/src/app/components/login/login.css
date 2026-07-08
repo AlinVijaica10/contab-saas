@@ -1,0 +1,72 @@
+.auth-form {
+  max-width: 450px;
+  margin: 48px auto;
+  padding: 32px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #444;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #2c3e50;
+}
+
+button[type="submit"] {
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100%;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  background-color: #1a252f;
+}
+
+button[type="submit"]:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #c0392b;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.switch-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.switch-link a {
+  color: #2c3e50;
+  font-weight: 500;
+}

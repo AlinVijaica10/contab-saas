@@ -1,0 +1,48 @@
+<div class="client-list">
+  <div class="header">
+    <h2>Clienții mei</h2>
+    <a routerLink="/clients/add" class="btn-add">+ Adaugă client</a>
+  </div>
+
+  @if (loading()) {
+    <p>Se încarcă...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!loading() && !error() && clients().length === 0) {
+    <p>Nu ai clienți încă.</p>
+  }
+
+  @if (clients().length > 0) {
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Firmă</th>
+        <th>CUI</th>
+        <th>Email contact</th>
+        <th>Status</th>
+        <th>Acțiuni</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (client of clients(); track client.id) {
+          <tr>
+            <td>{{ client.id }}</td>
+            <td>{{ client.companyName }}</td>
+            <td>{{ client.cui || '-' }}</td>
+            <td>{{ client.contactEmail }}</td>
+            <td>{{ client.status }}</td>
+            <td class="actions">
+              <a [routerLink]="['/clients/edit', client.id]">Editează</a>
+              <button (click)="deleteClient(client.id)">Șterge</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
