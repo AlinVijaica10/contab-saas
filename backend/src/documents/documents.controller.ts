@@ -4,6 +4,8 @@ import {
   Post,
   Param,
   Res,
+  Request,
+  Query,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -11,12 +13,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Response } from 'express';
+import type { Response, Request as ExpressRequest } from 'express';
 import { createReadStream } from 'fs';
 import { existsSync } from 'fs';
 import { DocumentsService } from './documents.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UploadDocumentDto } from './dto/upload-document.dto';
+
+interface AuthenticatedRequest extends ExpressRequest {
+  user: { tenantId: number; sub: number; email: string; role: string };
+}
 
 @Controller('documents')
 export class DocumentsController {
@@ -38,14 +44,35 @@ export class DocumentsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('client/:clientId')
-  async listByClient(@Param('clientId') clientId: string) {
-    return this.documentsService.listByClient(+clientId);
+  async listByClient(
+    @Param('clientId') clientId: string,
+    @Query('source') source?: 'CLIENT_UPLOAD' | 'INTERNAL',
+  ) {
+    return this.documentsService.listByClient(+clientId, source);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('client/:clientId/internal-upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadInternal(
+    @Request() req: AuthenticatedRequest,
+    @Param('clientId') clientId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: UploadDocumentDto,
+  ) {
+    return this.documentsService.uploadInternal(
+      req.user.tenantId,
+      +clientId,
+      file,
+      dto.category,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id/download')
   async download(@Param('id') id: string, @Res() res: Response) {
-    const { doc, filePath } = await this.documentsService.getFileForDownload(+id);
+    const { doc, filePath } =
+      await this.documentsService.getFileForDownload(+id);
 
     if (!existsSync(filePath)) {
       throw new NotFoundException('Fișierul nu mai există pe disc.');
@@ -79,4 +106,3 @@ export class DocumentsController {
     return this.documentsService.uploadPublic(token, file, dto.category);
   }
 }
-

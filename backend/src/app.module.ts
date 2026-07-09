@@ -7,6 +7,8 @@ import { ClientsModule } from './clients/clients.module';
 import { ClsModule } from 'nestjs-cls';
 import { InvoicesModule } from './invoices/invoices.module';
 import { DocumentsModule } from './documents/documents.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { DeclarationsModule } from './declarations/declarations.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { DocumentsModule } from './documents/documents.module';
     AuthModule,
     ClientsModule,
     InvoicesModule,
-    DocumentsModule
+    DocumentsModule,
+    DashboardModule,
+    DeclarationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

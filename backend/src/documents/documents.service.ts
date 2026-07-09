@@ -41,9 +41,9 @@ export class DocumentsService {
     });
   }
 
-  async listByClient(clientId: number) {
+  async listByClient(clientId: number, source?: 'CLIENT_UPLOAD' | 'INTERNAL') {
     return this.prisma.forTenant().document.findMany({
-      where: { clientId },
+      where: { clientId, ...(source ? { source } : {}) },
       orderBy: { uploadedAt: 'desc' },
     });
   }
@@ -55,7 +55,11 @@ export class DocumentsService {
     if (!doc) {
       throw new NotFoundException(`Document with id ${id} not found`);
     }
-    const filePath = this.storage.getFilePath(doc.tenantId, doc.clientId, doc.storedName);
+    const filePath = this.storage.getFilePath(
+      doc.tenantId,
+      doc.clientId,
+      doc.storedName,
+    );
     return { doc, filePath };
   }
 
@@ -97,11 +101,42 @@ export class DocumentsService {
         tenantId: link.tenantId,
         clientId: link.clientId,
         category: category ?? 'OTHER',
+        source: 'CLIENT_UPLOAD',
         originalName: file.originalname,
         storedName,
         mimeType: file.mimetype,
         size: file.size,
       },
+    });
+  }
+
+  async uploadInternal(
+    tenantId: number,
+    clientId: number,
+    file: Express.Multer.File,
+    category?: DocumentCategoryDto,
+  ) {
+    if (!file) {
+      throw new BadRequestException('Niciun fișier trimis.');
+    }
+
+    const { storedName } = await this.storage.save(
+      tenantId,
+      clientId,
+      file.originalname,
+      file.buffer,
+    );
+
+    return this.prisma.forTenant().document.create({
+      data: {
+        clientId,
+        category: category ?? 'OTHER',
+        source: 'INTERNAL',
+        originalName: file.originalname,
+        storedName,
+        mimeType: file.mimetype,
+        size: file.size,
+      } as any, // tenantId injectat automat de forTenant()
     });
   }
 }

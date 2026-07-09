@@ -1,79 +1,81 @@
 <div class="invoice-form">
-  <h2>Factură nouă</h2>
+  <h2>{{ isEditMode ? 'Editează factura' : 'Factură nouă' }}</h2>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="field">
-      <label for="clientId">Client *</label>
-      <select id="clientId" formControlName="clientId">
-        <option [ngValue]="null" disabled>Selectează un client</option>
-        @for (client of clients; track client.id) {
-          <option [ngValue]="client.id">{{ client.companyName }}</option>
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (isReady()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="clientId">Client *</label>
+        <select id="clientId" formControlName="clientId">
+          <option [ngValue]="null" disabled>Selectează un client</option>
+          @for (client of clients; track client.id) {
+            <option [ngValue]="client.id">{{ client.companyName }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="dueDate">Data scadenței</label>
+        <input id="dueDate" type="date" formControlName="dueDate">
+      </div>
+
+      <div class="field">
+        <label for="currency">Valută</label>
+        <select id="currency" formControlName="currency">
+          <option value="RON">RON</option>
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+
+      <h3>Linii factură</h3>
+
+      <div formArrayName="items">
+        @for (item of items.controls; track $index; let i = $index) {
+          <div class="item-row" [formGroupName]="i">
+            <div class="field">
+              <label>Descriere</label>
+              <input type="text" formControlName="description">
+            </div>
+            <div class="field small">
+              <label>Cantitate</label>
+              <input type="number" formControlName="quantity" step="0.01">
+            </div>
+            <div class="field small">
+              <label>Preț unitar</label>
+              <input type="number" formControlName="unitPrice" step="0.01">
+            </div>
+            <div class="field small">
+              <label>TVA %</label>
+              <input type="number" formControlName="vatRate" step="1">
+            </div>
+            <div class="line-total">
+              {{ calculateLineTotal(i) | number: '1.2-2' }}
+            </div>
+            <button type="button" class="btn-remove" (click)="removeItem(i)">✕</button>
+          </div>
         }
-      </select>
-    </div>
+      </div>
 
-    <div class="field">
-      <label for="dueDate">Data scadenței</label>
-      <input id="dueDate" type="date" formControlName="dueDate">
-    </div>
+      <button type="button" class="btn-add-line" (click)="addItem()">+ Adaugă linie</button>
 
-    <div class="field">
-      <label for="currency">Valută</label>
-      <select id="currency" formControlName="currency">
-        <option value="RON">RON</option>
-        <option value="EUR">EUR</option>
-        <option value="USD">USD</option>
-      </select>
-    </div>
+      <div class="field">
+        <label for="notes">Observații</label>
+        <textarea id="notes" formControlName="notes"></textarea>
+      </div>
 
-    <h3>Linii factură</h3>
+      <div class="totals">
+        <div><span>Subtotal</span><span>{{ calculateSubtotal() | number: '1.2-2' }}</span></div>
+        <div><span>TVA</span><span>{{ calculateVatTotal() | number: '1.2-2' }}</span></div>
+        <div class="grand-total"><span>Total</span><span>{{ calculateTotal() | number: '1.2-2' }}</span></div>
+      </div>
 
-    <div formArrayName="items">
-      @for (item of items.controls; track $index; let i = $index) {
-        <div class="item-row" [formGroupName]="i">
-          <div class="field">
-            <label>Descriere</label>
-            <input type="text" formControlName="description">
-          </div>
-          <div class="field small">
-            <label>Cantitate</label>
-            <input type="number" formControlName="quantity" step="0.01">
-          </div>
-          <div class="field small">
-            <label>Preț unitar</label>
-            <input type="number" formControlName="unitPrice" step="0.01">
-          </div>
-          <div class="field small">
-            <label>TVA %</label>
-            <input type="number" formControlName="vatRate" step="1">
-          </div>
-          <div class="line-total">
-            {{ calculateLineTotal(i) | number: '1.2-2' }}
-          </div>
-          <button type="button" class="btn-remove" (click)="removeItem(i)">✕</button>
-        </div>
-      }
-    </div>
-
-    <button type="button" class="btn-add-line" (click)="addItem()">+ Adaugă linie</button>
-
-    <div class="field">
-      <label for="notes">Observații</label>
-      <textarea id="notes" formControlName="notes"></textarea>
-    </div>
-
-    <div class="totals">
-      <div><span>Subtotal</span><span>{{ calculateSubtotal() | number: '1.2-2' }}</span></div>
-      <div><span>TVA</span><span>{{ calculateVatTotal() | number: '1.2-2' }}</span></div>
-      <div class="grand-total"><span>Total</span><span>{{ calculateTotal() | number: '1.2-2' }}</span></div>
-    </div>
-
-    @if (error) {
-      <p class="error">{{ error }}</p>
-    }
-
-    <button type="submit" [disabled]="form.invalid || submitting">
-      {{ submitting ? 'Se salvează...' : 'Salvează factura' }}
-    </button>
-  </form>
+      <button type="submit" [disabled]="form.invalid || submitting">
+        {{ submitting ? 'Se salvează...' : (isEditMode ? 'Salvează modificările' : 'Salvează factura') }}
+      </button>
+    </form>
+  }
 </div>

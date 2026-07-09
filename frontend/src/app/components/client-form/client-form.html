@@ -30,6 +30,74 @@
       </select>
     </div>
 
+    <hr>
+    <h3>Profil fiscal</h3>
+
+    <div class="field">
+      <label for="clientType">Tip client *</label>
+      <select id="clientType" formControlName="clientType">
+        <option value="SRL">SRL</option>
+        <option value="PFA">PFA</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="fiscalRegime">Regim fiscal *</label>
+      @if (isSrl) {
+        <select id="fiscalRegime" formControlName="fiscalRegime">
+          <option value="MICRO">Micro (impozit pe venit)</option>
+          <option value="PROFIT">Impozit pe profit</option>
+        </select>
+      } @else {
+        <select id="fiscalRegime" formControlName="fiscalRegime">
+          <option value="REAL">Sistem real</option>
+          <option value="NORMA_VENIT">Normă de venit</option>
+        </select>
+      }
+    </div>
+
+    <div class="field checkbox-field">
+      <label>
+        <input type="checkbox" formControlName="isVatPayer">
+        Plătitor de TVA
+      </label>
+    </div>
+
+    @if (isVatPayer) {
+      <div class="field">
+        <label for="vatPeriodicity">Periodicitate TVA</label>
+        <select id="vatPeriodicity" formControlName="vatPeriodicity">
+          <option value="MONTHLY">Lunar</option>
+          <option value="QUARTERLY">Trimestrial</option>
+        </select>
+      </div>
+    }
+
+    <div class="field checkbox-field">
+      <label>
+        <input type="checkbox" formControlName="hasEmployees">
+        Are angajați
+      </label>
+    </div>
+
+    <hr>
+    <h3>Facturare lunară automată</h3>
+
+    <div class="field">
+      <label for="monthlyFee">Tarif lunar (RON)</label>
+      <input id="monthlyFee" type="number" step="0.01" formControlName="monthlyFee" placeholder="Lasă gol dacă nu se aplică">
+    </div>
+
+    <div class="field">
+      <label for="monthlyFeeVatRate">TVA pentru serviciul lunar (%)</label>
+      <input id="monthlyFeeVatRate" type="number" step="1" formControlName="monthlyFeeVatRate">
+    </div>
+
+    <div class="field">
+      <label for="monthlyFeeDescription">Descriere pe factură</label>
+      <input id="monthlyFeeDescription" type="text" formControlName="monthlyFeeDescription">
+    </div>
+
     @if (error) {
       <p class="error">{{ error }}</p>
     }

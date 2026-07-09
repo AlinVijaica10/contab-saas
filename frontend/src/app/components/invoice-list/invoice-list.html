@@ -4,6 +4,59 @@
     <a routerLink="/invoices/add" class="btn-add">+ Factură nouă</a>
   </div>
 
+  <div class="filter-box">
+    <label>Filtrează după lună:</label>
+    <select [(ngModel)]="filterMonth" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="null">Toate lunile</option>
+      @for (name of monthNames; track $index) {
+        <option [ngValue]="$index + 1">{{ name }}</option>
+      }
+    </select>
+    <select [(ngModel)]="filterYear" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="null">Toți anii</option>
+      @for (y of years; track y) {
+        <option [ngValue]="y">{{ y }}</option>
+      }
+    </select>
+    @if (filterMonth || filterYear) {
+      <button (click)="clearFilter()" class="btn-clear">Resetează filtrul</button>
+    }
+  </div>
+
+  <div class="generate-box">
+    <h3>Generare automată facturi lunare</h3>
+    <div class="generate-row">
+      <select [(ngModel)]="selectedMonth">
+        @for (name of monthNames; track $index) {
+          <option [ngValue]="$index + 1">{{ name }}</option>
+        }
+      </select>
+      <select [(ngModel)]="selectedYear">
+        @for (y of years; track y) {
+          <option [ngValue]="y">{{ y }}</option>
+        }
+      </select>
+      <button (click)="generateMonthlyInvoices()" [disabled]="generating()">
+        {{ generating() ? 'Se generează...' : 'Generează facturile' }}
+      </button>
+    </div>
+
+    @if (generationResults(); as results) {
+      <div class="generation-results">
+        @for (result of results; track result.clientId) {
+          <div class="result-row" [class.success]="result.success" [class.failed]="!result.success">
+            {{ result.companyName }} —
+            @if (result.success) {
+              ✅ Factură generată
+            } @else {
+              ❌ Eroare: {{ result.error }}
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
   @if (loading()) {
     <p>Se încarcă...</p>
   }
@@ -38,6 +91,10 @@
             <td>{{ invoice.total }} {{ invoice.currency }}</td>
             <td class="actions">
               <button (click)="downloadPdf(invoice.id)">Descarcă PDF</button>
+              @if (invoice.status === 'DRAFT') {
+                <a [routerLink]="['/invoices/edit', invoice.id]" class="btn-edit">Editează</a>
+                <button (click)="deleteInvoice(invoice)" class="btn-delete">Șterge</button>
+              }
             </td>
           </tr>
         }

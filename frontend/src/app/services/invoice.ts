@@ -51,6 +51,14 @@ export interface CreateInvoicePayload {
   }[];
 }
 
+export interface GenerateMonthlyResult {
+  clientId: number;
+  companyName: string;
+  success: boolean;
+  invoiceId?: number;
+  error?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -59,8 +67,20 @@ export class InvoiceService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Invoice[]> {
-    return this.http.get<Invoice[]>(this.apiUrl);
+  getAll(month?: number, year?: number): Observable<Invoice[]> {
+    let params: any = {};
+    if (month && year) {
+      params = { month: month.toString(), year: year.toString() };
+    }
+    return this.http.get<Invoice[]>(this.apiUrl, { params });
+  }
+
+  update(id: number, invoice: CreateInvoicePayload): Observable<Invoice> {
+    return this.http.patch<Invoice>(`${this.apiUrl}/${id}`, invoice);
+  }
+
+  delete(id: number): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.apiUrl}/${id}`);
   }
 
   getOne(id: number): Observable<Invoice> {
@@ -74,6 +94,13 @@ export class InvoiceService {
   downloadPdf(id: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/${id}/pdf`, {
       responseType: 'blob',
+    });
+  }
+
+  generateMonthly(month: number, year: number): Observable<GenerateMonthlyResult[]> {
+    return this.http.post<GenerateMonthlyResult[]>(`${this.apiUrl}/generate-monthly`, {
+      month,
+      year,
     });
   }
 }

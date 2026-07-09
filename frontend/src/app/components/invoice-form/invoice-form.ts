@@ -1,15 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, OnInit, signal } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { InvoiceService } from '../../services/invoice';
 import { ClientService, Client } from '../../services/client';
-import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-invoice-form',
@@ -21,20 +15,24 @@ export class InvoiceForm implements OnInit {
   form: FormGroup;
   clients: Client[] = [];
   submitting = false;
-  error = '';
+  error = signal('');
+  isEditMode = false;
+  invoiceId: number | null = null;
+  isReady = signal(false);
 
   constructor(
     private fb: FormBuilder,
     private invoiceService: InvoiceService,
     private clientService: ClientService,
     private router: Router,
+    private route: ActivatedRoute,
   ) {
     this.form = this.fb.group({
       clientId: [null, Validators.required],
       dueDate: [''],
       currency: ['RON'],
       notes: [''],
-      items: this.fb.array([this.createItemGroup()]),
+      items: this.fb.array([]),
     });
   }
 
@@ -43,6 +41,47 @@ export class InvoiceForm implements OnInit {
       next: (data) => (this.clients = data),
       error: (err) => console.error(err),
     });
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.isEditMode = true;
+      this.invoiceId = +idParam;
+      this.invoiceService.getOne(this.invoiceId).subscribe({
+        next: (invoice) => {
+          if (invoice.status !== 'DRAFT') {
+            this.error.set('Doar facturile în stadiul DRAFT pot fi editate.');
+            return;
+          }
+
+          invoice.items.forEach((item) => {
+            this.items.push(
+              this.fb.group({
+                description: [item.description, Validators.required],
+                quantity: [item.quantity, [Validators.required, Validators.min(0.01)]],
+                unitPrice: [item.unitPrice, [Validators.required, Validators.min(0)]],
+                vatRate: [item.vatRate, [Validators.required, Validators.min(0)]],
+              }),
+            );
+          });
+
+          this.form.patchValue({
+            clientId: invoice.clientId,
+            dueDate: invoice.dueDate ? invoice.dueDate.substring(0, 10) : '',
+            currency: invoice.currency,
+            notes: invoice.notes,
+          });
+
+          this.isReady.set(true);
+        },
+        error: (err) => {
+          this.error.set('Nu am putut încărca factura.');
+          console.error(err);
+        },
+      });
+    } else {
+      this.items.push(this.createItemGroup());
+      this.isReady.set(true);
+    }
   }
 
   get items(): FormArray {
@@ -94,14 +133,19 @@ export class InvoiceForm implements OnInit {
     }
 
     this.submitting = true;
-    this.error = '';
+    this.error.set('');
 
-    this.invoiceService.create(this.form.value).subscribe({
+    const request =
+      this.isEditMode && this.invoiceId
+        ? this.invoiceService.update(this.invoiceId, this.form.value)
+        : this.invoiceService.create(this.form.value);
+
+    request.subscribe({
       next: () => {
         this.router.navigate(['/invoices']);
       },
       error: (err) => {
-        this.error = 'Nu am putut salva factura.';
+        this.error.set('Nu am putut salva factura.');
         this.submitting = false;
         console.error(err);
       },

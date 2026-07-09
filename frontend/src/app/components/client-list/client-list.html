@@ -42,6 +42,7 @@
                 {{ copiedClientId() === client.id ? 'Copiat!' : 'Copiază link' }}
               </button>
               <a [routerLink]="['/clients', client.id, 'documents']">Documente</a>
+              <a [routerLink]="['/clients', client.id, 'declarations']">Declarații</a>
               <button (click)="deleteClient(client.id)">Șterge</button>
             </td>
           </tr>

@@ -1,0 +1,90 @@
+.client-declarations {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.back-link {
+  color: #2c3e50;
+  text-decoration: none;
+  font-size: 14px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.period-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.period-selector select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+th {
+  background-color: #2c3e50;
+  color: white;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+tr.submitted {
+  background-color: #f7fdf9;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge.ok {
+  background-color: #eafaf1;
+  color: #27ae60;
+}
+
+.badge.warning {
+  background-color: #fdedec;
+  color: #c0392b;
+}
+
+td button {
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.error {
+  color: #c0392b;
+  font-weight: 500;
+}

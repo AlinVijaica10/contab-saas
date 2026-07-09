@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Document {
   id: number;
   category: string;
+  source: 'CLIENT_UPLOAD' | 'INTERNAL';
   originalName: string;
   mimeType: string;
   size: number;
@@ -36,11 +37,25 @@ export class DocumentService {
   }
 
   regenerateUploadLink(clientId: number): Observable<UploadLink> {
-    return this.http.post<UploadLink>(`${this.apiUrl}/client/${clientId}/upload-link/regenerate`, {});
+    return this.http.post<UploadLink>(
+      `${this.apiUrl}/client/${clientId}/upload-link/regenerate`,
+      {},
+    );
   }
 
-  listByClient(clientId: number): Observable<Document[]> {
-    return this.http.get<Document[]>(`${this.apiUrl}/client/${clientId}`);
+  listByClient(clientId: number, source?: 'CLIENT_UPLOAD' | 'INTERNAL'): Observable<Document[]> {
+    let params = new HttpParams();
+    if (source) {
+      params = params.set('source', source);
+    }
+    return this.http.get<Document[]>(`${this.apiUrl}/client/${clientId}`, { params });
+  }
+
+  uploadInternal(clientId: number, file: File, category: string): Observable<Document> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('category', category);
+    return this.http.post<Document>(`${this.apiUrl}/client/${clientId}/internal-upload`, formData);
   }
 
   downloadDocument(id: number): Observable<Blob> {

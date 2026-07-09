@@ -10,6 +10,14 @@ export interface Client {
   contactPerson?: string;
   status: string;
   createdAt: string;
+  clientType: 'SRL' | 'PFA';
+  fiscalRegime: 'MICRO' | 'PROFIT' | 'REAL' | 'NORMA_VENIT';
+  isVatPayer: boolean;
+  vatPeriodicity?: 'MONTHLY' | 'QUARTERLY' | null;
+  hasEmployees: boolean;
+  monthlyFee?: number;
+  monthlyFeeVatRate?: number;
+  monthlyFeeDescription?: string;
 }
 
 @Injectable({

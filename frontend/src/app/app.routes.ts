@@ -8,6 +8,8 @@ import { authGuard } from './guards/auth-guard';
 import { InvoiceForm } from './components/invoice-form/invoice-form';
 import { PublicUpload } from './components/public-upload/public-upload';
 import { ClientDocuments } from './components/client-documents/client-documents';
+import { Dashboard } from './components/dashboard/dashboard';
+import { ClientDeclarations } from './components/client-declarations/client-declarations';
 
 
 export const routes: Routes = [
@@ -21,4 +23,7 @@ export const routes: Routes = [
   { path: 'invoices/add', component: InvoiceForm, canActivate: [authGuard] },
   { path: 'upload/:token', component: PublicUpload },
   { path: 'clients/:id/documents', component: ClientDocuments, canActivate: [authGuard] },
+  { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
+  { path: 'clients/:id/declarations', component: ClientDeclarations, canActivate: [authGuard] },
+  { path: 'invoices/edit/:id', component: InvoiceForm, canActivate: [authGuard] },
 ];

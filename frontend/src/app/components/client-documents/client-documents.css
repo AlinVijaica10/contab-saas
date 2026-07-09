@@ -16,6 +16,71 @@
   margin-bottom: 8px;
 }
 
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tab.active {
+  color: #2c3e50;
+  font-weight: 600;
+  border-bottom-color: #2c3e50;
+}
+
+.internal-upload-box {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.internal-upload-box h3 {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.upload-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.upload-row select,
+.upload-row input[type="file"] {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.upload-row button {
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.upload-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

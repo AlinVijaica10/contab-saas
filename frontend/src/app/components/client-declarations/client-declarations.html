@@ -1,0 +1,65 @@
+<div class="client-declarations">
+  <div class="header">
+    <a routerLink="/clients" class="back-link">← Înapoi la clienți</a>
+    <h2>Declarații — {{ clientName() }}</h2>
+  </div>
+
+  <div class="period-selector">
+    <select [(ngModel)]="selectedMonth" (ngModelChange)="onPeriodChange()">
+      @for (name of monthNames; track $index) {
+        <option [ngValue]="$index + 1">{{ name }}</option>
+      }
+    </select>
+    <select [(ngModel)]="selectedYear" (ngModelChange)="onPeriodChange()">
+      @for (y of years; track y) {
+        <option [ngValue]="y">{{ y }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <p>Se încarcă...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (!loading() && !error() && declarations().length === 0) {
+    <p>Nu există declarații aplicabile pentru această perioadă.</p>
+  }
+
+  @if (declarations().length > 0) {
+    <table>
+      <thead>
+      <tr>
+        <th>Declarație</th>
+        <th>Status</th>
+        <th>Data depunerii</th>
+        <th>Acțiuni</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (decl of declarations(); track decl.type) {
+          <tr [class.submitted]="decl.submitted">
+            <td>{{ decl.label }}</td>
+            <td>
+              @if (decl.submitted) {
+                <span class="badge ok">Depusă</span>
+              } @else {
+                <span class="badge warning">Nedepusă</span>
+              }
+            </td>
+            <td>{{ decl.submittedAt ? (decl.submittedAt | date: 'dd.MM.yyyy') : '-' }}</td>
+            <td>
+              <button (click)="toggleSubmitted(decl)">
+                {{ decl.submitted ? 'Marchează nedepusă' : 'Marchează depusă' }}
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
+

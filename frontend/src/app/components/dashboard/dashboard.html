@@ -1,0 +1,109 @@
+<div class="dashboard">
+  <div class="header">
+    <h2>Dashboard lunar</h2>
+    <div class="period-selector">
+      <select [(ngModel)]="selectedMonth" (ngModelChange)="onPeriodChange()">
+        @for (name of monthNames; track $index) {
+          <option [ngValue]="$index + 1">{{ name }}</option>
+        }
+      </select>
+      <select [(ngModel)]="selectedYear" (ngModelChange)="onPeriodChange()">
+        @for (y of years; track y) {
+          <option [ngValue]="y">{{ y }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p>Se încarcă...</p>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (summary(); as data) {
+    <div class="totals-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total facturat</span>
+        <span class="stat-value">{{ data.totals.totalInvoiced | number: '1.2-2' }} RON</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total încasat</span>
+        <span class="stat-value paid">{{ data.totals.totalPaid | number: '1.2-2' }} RON</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total neîncasat</span>
+        <span class="stat-value unpaid">{{ data.totals.totalUnpaid | number: '1.2-2' }} RON</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Documente încărcate</span>
+        <span class="stat-value">{{ data.totals.totalDocuments }}</span>
+      </div>
+      <div class="stat-card" [class.alert]="data.totals.clientsWithoutDocuments > 0">
+        <span class="stat-label">Clienți fără documente</span>
+        <span class="stat-value">{{ data.totals.clientsWithoutDocuments }}</span>
+      </div>
+      <div class="stat-card" [class.alert]="data.totals.clientsWithPendingDeclarations > 0">
+        <span class="stat-label">Clienți cu declarații nedepuse</span>
+        <span class="stat-value">{{ data.totals.clientsWithPendingDeclarations }}</span>
+      </div>
+    </div>
+
+    <h3>Detaliere pe client</h3>
+
+    @if (data.clients.length === 0) {
+      <p>Nu ai clienți încă.</p>
+    }
+
+    @if (data.clients.length > 0) {
+      <table>
+        <thead>
+        <tr>
+          <th>Client</th>
+          <th>Facturi</th>
+          <th>Total facturat</th>
+          <th>Încasat</th>
+          <th>Neîncasat</th>
+          <th>Documente</th>
+          <th>Declarații</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (client of data.clients; track client.clientId) {
+            <tr [class.missing-docs]="!client.hasDocuments || client.hasPendingDeclarations">
+              <td>
+                <a [routerLink]="['/clients', client.clientId, 'documents']">
+                  {{ client.companyName }}
+                </a>
+              </td>
+              <td>{{ client.invoiceCount }}</td>
+              <td>{{ client.totalInvoiced | number: '1.2-2' }} RON</td>
+              <td>{{ client.totalPaid | number: '1.2-2' }} RON</td>
+              <td>{{ client.totalUnpaid | number: '1.2-2' }} RON</td>
+              <td>
+                @if (client.hasDocuments) {
+                  <span class="badge ok">{{ client.documentCount }} documente</span>
+                } @else {
+                  <span class="badge warning">Fără documente ⚠️</span>
+                }
+              </td>
+              <td>
+                @if (!client.hasPendingDeclarations) {
+                  <span class="badge ok">La zi ✓</span>
+                } @else {
+                  <a [routerLink]="['/clients', client.clientId, 'declarations']" class="badge warning">
+                    {{ client.pendingDeclarationsCount }} nedepuse ⚠️
+                  </a>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</div>
+
+

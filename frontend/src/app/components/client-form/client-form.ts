@@ -28,7 +28,28 @@ export class ClientForm implements OnInit {
       contactEmail: ['', [Validators.required, Validators.email]],
       contactPerson: [''],
       status: ['active'],
+      clientType: ['SRL', Validators.required],
+      fiscalRegime: ['MICRO', Validators.required],
+      isVatPayer: [false],
+      vatPeriodicity: ['MONTHLY'],
+      hasEmployees: [false],
+      monthlyFee: [null],
+      monthlyFeeVatRate: [0],
+      monthlyFeeDescription: ['Servicii de contabilitate'],
     });
+
+    this.form.get('clientType')?.valueChanges.subscribe((type) => {
+      const defaultRegime = type === 'SRL' ? 'MICRO' : 'REAL';
+      this.form.get('fiscalRegime')?.setValue(defaultRegime);
+    });
+  }
+
+  get isSrl(): boolean {
+    return this.form.get('clientType')?.value === 'SRL';
+  }
+
+  get isVatPayer(): boolean {
+    return this.form.get('isVatPayer')?.value === true;
   }
 
   ngOnInit(): void {

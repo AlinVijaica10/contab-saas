@@ -1,12 +1,15 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { DocumentService, Document } from '../../services/document';
 import { ClientService } from '../../services/client';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe, KeyValuePipe } from '@angular/common';
+
+type Tab = 'CLIENT_UPLOAD' | 'INTERNAL';
 
 @Component({
   selector: 'app-client-documents',
-  imports: [RouterLink, DatePipe, DecimalPipe],
+  imports: [RouterLink, DatePipe, FormsModule, KeyValuePipe],
   templateUrl: './client-documents.html',
   styleUrl: './client-documents.css',
 })
@@ -16,11 +19,28 @@ export class ClientDocuments implements OnInit {
   documents = signal<Document[]>([]);
   loading = signal(true);
   error = signal('');
+  activeTab = signal<Tab>('CLIENT_UPLOAD');
 
-  categoryLabels: Record<string, string> = {
+  // upload intern
+  selectedFile: File | null = null;
+  internalCategory = 'CI_ADMINISTRATOR';
+  uploading = signal(false);
+
+  clientCategoryLabels: Record<string, string> = {
     INVOICE: 'Factură',
     BANK_STATEMENT: 'Extras de cont',
     CONTRACT: 'Contract',
+    OTHER: 'Alt document',
+  };
+
+  internalCategoryLabels: Record<string, string> = {
+    CI_ADMINISTRATOR: 'CI Administrator',
+    ACTE_INFIINTARE: 'Acte înființare firmă',
+    DECLARATII: 'Declarații',
+    ADEVERINTE: 'Adeverințe',
+    PONTAJE: 'Pontaje lunare',
+    STATE_SALARII: 'State de salarii',
+    BILANT: 'Bilanț',
     OTHER: 'Alt document',
   };
 
@@ -41,9 +61,14 @@ export class ClientDocuments implements OnInit {
     this.loadDocuments();
   }
 
+  switchTab(tab: Tab): void {
+    this.activeTab.set(tab);
+    this.loadDocuments();
+  }
+
   loadDocuments(): void {
     this.loading.set(true);
-    this.documentService.listByClient(this.clientId).subscribe({
+    this.documentService.listByClient(this.clientId, this.activeTab()).subscribe({
       next: (docs) => {
         this.documents.set(docs);
         this.loading.set(false);
@@ -54,6 +79,39 @@ export class ClientDocuments implements OnInit {
         console.error(err);
       },
     });
+  }
+
+  categoryLabel(doc: Document): string {
+    const labels =
+      doc.source === 'INTERNAL' ? this.internalCategoryLabels : this.clientCategoryLabels;
+    return labels[doc.category] || doc.category;
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedFile = input.files?.[0] || null;
+  }
+
+  onInternalUpload(): void {
+    if (!this.selectedFile) {
+      return;
+    }
+
+    this.uploading.set(true);
+    this.documentService
+      .uploadInternal(this.clientId, this.selectedFile, this.internalCategory)
+      .subscribe({
+        next: () => {
+          this.uploading.set(false);
+          this.selectedFile = null;
+          this.loadDocuments();
+        },
+        error: (err) => {
+          this.uploading.set(false);
+          alert('Nu am putut încărca documentul.');
+          console.error(err);
+        },
+      });
   }
 
   download(doc: Document): void {
@@ -79,4 +137,3 @@ export class ClientDocuments implements OnInit {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 }
-
