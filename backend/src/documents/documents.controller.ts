@@ -105,4 +105,28 @@ export class DocumentsController {
   ) {
     return this.documentsService.uploadPublic(token, file, dto.category);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('request-monthly')
+  async requestMonthly(@Body() body: { month: number; year: number }) {
+    return this.documentsService.requestMonthlyDocuments(body.month, body.year);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('request-history')
+  async getRequestHistory(
+    @Query('month') month?: string,
+    @Query('year') year?: string,
+  ) {
+    return this.documentsService.getRequestHistory(
+      month ? +month : undefined,
+      year ? +year : undefined,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('client/:clientId/send-email-request')
+  async sendEmailRequest(@Param('clientId') clientId: string) {
+    return this.documentsService.sendDocumentRequestEmail(+clientId);
+  }
 }

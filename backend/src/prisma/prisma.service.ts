@@ -10,6 +10,7 @@ const TENANT_SCOPED_MODELS = [
   'Document',
   'ClientUploadLink',
   'DeclarationSubmission',
+  'DocumentRequestLog',
 ];
 
 @Injectable()

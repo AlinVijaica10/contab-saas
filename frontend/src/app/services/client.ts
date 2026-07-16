@@ -7,6 +7,7 @@ export interface Client {
   companyName: string;
   cui?: string;
   contactEmail: string;
+  phoneNumber?: string;
   contactPerson?: string;
   status: string;
   createdAt: string;

@@ -82,4 +82,8 @@ export class CreateClientDto {
   @IsString()
   @IsOptional()
   monthlyFeeDescription?: string;
+
+  @IsString()
+  @IsOptional()
+  phoneNumber?: string;
 }

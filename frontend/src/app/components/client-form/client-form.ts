@@ -27,6 +27,7 @@ export class ClientForm implements OnInit {
       cui: [''],
       contactEmail: ['', [Validators.required, Validators.email]],
       contactPerson: [''],
+      phoneNumber: [''],
       status: ['active'],
       clientType: ['SRL', Validators.required],
       fiscalRegime: ['MICRO', Validators.required],
