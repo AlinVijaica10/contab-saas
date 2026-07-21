@@ -41,6 +41,15 @@
       </button>
     </div>
 
+    @if (anafStatus() && !anafStatus()!.connected) {
+      <button (click)="connectAnaf()" class="btn-anaf-connect">
+        🔗 Conectează contul ANAF
+      </button>
+    }
+    @if (anafStatus()?.connected) {
+      <span class="anaf-connected">✅ ANAF conectat</span>
+    }
+
     @if (generationResults(); as results) {
       <div class="generation-results">
         @for (result of results; track result.clientId) {
@@ -94,6 +103,24 @@
               @if (invoice.status === 'DRAFT') {
                 <a [routerLink]="['/invoices/edit', invoice.id]" class="btn-edit">Editează</a>
                 <button (click)="deleteInvoice(invoice)" class="btn-delete">Șterge</button>
+              }
+              @if (invoice.anafStatus !== 'OK') {
+                <button
+                  (click)="sendToAnaf(invoice)"
+                  [disabled]="sendingInvoiceId() === invoice.id"
+                >
+                  @if (sendingInvoiceId() === invoice.id) {
+                    Se trimite...
+                  } @else {
+                    Trimite la ANAF
+                  }
+                </button>
+              }
+              @if (invoice.anafStatus) {
+                <button (click)="checkAnafStatus(invoice)">Status: {{ invoice.anafStatus }}</button>
+              }
+              @if (invoice.anafDownloadId) {
+                <button (click)="downloadAnafResponse(invoice)">Descarcă răspuns ANAF</button>
               }
             </td>
           </tr>

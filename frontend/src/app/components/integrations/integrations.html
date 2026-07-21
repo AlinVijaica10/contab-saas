@@ -1,0 +1,103 @@
+<div class="integrations-page">
+  <div class="page-header">
+    <h2>Integrări</h2>
+    <p class="hint">Conexiunile aplicației cu servicii externe: ANAF (e-Factura) și email.</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">Se încarcă...</div>
+  }
+
+  @if (!loading() && status(); as s) {
+    <div class="cards-grid">
+
+      <div class="integration-card">
+        <div class="card-header">
+          <span class="card-icon">🏛️</span>
+          <div>
+            <h3>ANAF — e-Factura</h3>
+            <p class="card-subtitle">Autentificare OAuth2 cu certificat digital, pentru trimiterea facturilor.</p>
+          </div>
+        </div>
+
+        <div class="card-body">
+          @if (s.anaf.connected) {
+            <div class="status-row connected">
+              <span class="status-dot"></span>
+              Conectat
+              @if (s.anaf.expiresAt) {
+                <span class="status-detail">— token valabil până la {{ s.anaf.expiresAt | date: 'dd.MM.yyyy HH:mm' }}</span>
+              }
+            </div>
+          } @else {
+            <div class="status-row disconnected">
+              <span class="status-dot"></span>
+              Neconectat
+            </div>
+          }
+        </div>
+
+        <div class="card-footer">
+          <button (click)="connectAnaf()">
+            {{ s.anaf.connected ? 'Reconectează' : 'Conectează ANAF' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="integration-card">
+        <div class="card-header">
+          <span class="card-icon">✉️</span>
+          <div>
+            <h3>Email (Brevo)</h3>
+            <p class="card-subtitle">Folosit pentru notificări și solicitări de documente către clienți.</p>
+          </div>
+        </div>
+
+        <div class="card-body">
+          @if (s.email.configured) {
+            <div class="status-row connected">
+              <span class="status-dot"></span>
+              Configurat
+              <span class="status-detail">— expeditor: {{ s.email.senderName }} &lt;{{ s.email.senderEmail }}&gt;</span>
+            </div>
+          } @else {
+            <div class="status-row disconnected">
+              <span class="status-dot"></span>
+              Neconfigurat — verifică BREVO_API_KEY în .env
+            </div>
+          }
+
+          <div class="test-email-row">
+            <input
+              type="email"
+              placeholder="adresa@exemplu.ro"
+              [(ngModel)]="testEmailAddress"
+              name="testEmailAddress"
+            >
+            <button (click)="sendTestEmail()" [disabled]="sendingTestEmail() || !testEmailAddress">
+              {{ sendingTestEmail() ? 'Se trimite...' : 'Trimite test' }}
+            </button>
+          </div>
+
+          @if (testEmailResult() === 'success') {
+            <p class="status-message success">✓ Email trimis — verifică inbox-ul.</p>
+          }
+          @if (testEmailResult() === 'error') {
+            <p class="status-message error">⚠ {{ testEmailError() }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="integration-card placeholder">
+        <div class="card-header">
+          <span class="card-icon">➕</span>
+          <div>
+            <h3>Alte integrări</h3>
+            <p class="card-subtitle">Aici vor apărea integrări viitoare (ex: SMS, WhatsApp, alte servicii).</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+</div>

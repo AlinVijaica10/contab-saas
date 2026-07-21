@@ -9,6 +9,10 @@ import { InvoicesModule } from './invoices/invoices.module';
 import { DocumentsModule } from './documents/documents.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { DeclarationsModule } from './declarations/declarations.module';
+import { AnafModule } from './anaf/anaf.module';
+import { EfacturaModule } from './e-factura/efactura.module';
+import { TenantModule } from './tenant/tenant.module';
+import { IntegrationsModule } from './integrations/integrations.module';
 
 @Module({
   imports: [
@@ -23,6 +27,10 @@ import { DeclarationsModule } from './declarations/declarations.module';
     DocumentsModule,
     DashboardModule,
     DeclarationsModule,
+    AnafModule,
+    EfacturaModule,
+    TenantModule,
+    IntegrationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

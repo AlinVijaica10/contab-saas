@@ -49,6 +49,8 @@ export class InvoicesService {
         vatTotal,
         total,
         notes: dto.notes,
+        recurringMonth: dto.recurringMonth ?? null,
+        recurringYear: dto.recurringYear ?? null,
         items: {
           create: items,
         },
@@ -104,35 +106,71 @@ export class InvoicesService {
       clientId: number;
       companyName: string;
       success: boolean;
+      skipped?: boolean;
       invoiceId?: number;
       error?: string;
     }> = [];
 
     for (const client of clients) {
+      // verificăm dacă a fost deja generată o factură recurentă pentru
+      // acest client + lună + an - fără asta, apăsarea repetată a butonului
+      // ar crea facturi duplicate pentru aceeași lună.
+      const existing = await this.prisma.forTenant().invoice.findFirst({
+        where: {
+          clientId: client.id,
+          recurringMonth: month,
+          recurringYear: year,
+        },
+      });
+
+      if (existing) {
+        results.push({
+          clientId: client.id,
+          companyName: client.companyName,
+          success: false,
+          skipped: true,
+          error: `Factura pentru ${this.monthNames[month - 1]} ${year} a fost deja generată (nr. ${existing.number}).`,
+        });
+        continue;
+      }
+
       const monthLabel = this.monthNames[month - 1];
       const description = `${client.monthlyFeeDescription ?? 'Servicii de contabilitate'} - ${monthLabel} ${year}`;
 
       try {
         const invoice = await this.create(tenantId, {
           clientId: client.id,
+          recurringMonth: month,
+          recurringYear: year,
           items: [
             {
               description,
               quantity: 1,
               unitPrice: Number(client.monthlyFee),
-              vatRate: client.monthlyFeeVatRate ? Number(client.monthlyFeeVatRate) : 19,
+              vatRate: client.monthlyFeeVatRate
+                ? Number(client.monthlyFeeVatRate)
+                : 19,
             },
           ],
         });
-        results.push({ clientId: client.id, companyName: client.companyName, success: true, invoiceId: invoice.id });
+        results.push({
+          clientId: client.id,
+          companyName: client.companyName,
+          success: true,
+          invoiceId: invoice.id,
+        });
       } catch (err) {
-        results.push({ clientId: client.id, companyName: client.companyName, success: false, error: (err as Error).message });
+        results.push({
+          clientId: client.id,
+          companyName: client.companyName,
+          success: false,
+          error: (err as Error).message,
+        });
       }
     }
 
     return results;
   }
-
   async remove(id: number) {
     const invoice = await this.prisma.forTenant().invoice.findFirst({
       where: { id },
@@ -144,7 +182,9 @@ export class InvoicesService {
     }
 
     if (invoice.status !== 'DRAFT') {
-      throw new BadRequestException('Doar facturile în stadiul DRAFT pot fi șterse.');
+      throw new BadRequestException(
+        'Doar facturile în stadiul DRAFT pot fi șterse.',
+      );
     }
 
     await this.prisma.$transaction(async (tx) => {
@@ -172,7 +212,9 @@ export class InvoicesService {
     }
 
     if (existing.status !== 'DRAFT') {
-      throw new BadRequestException('Doar facturile în stadiul DRAFT pot fi editate.');
+      throw new BadRequestException(
+        'Doar facturile în stadiul DRAFT pot fi editate.',
+      );
     }
 
     let subtotal = 0;

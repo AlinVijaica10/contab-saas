@@ -103,6 +103,39 @@
       <input id="monthlyFeeDescription" type="text" formControlName="monthlyFeeDescription">
     </div>
 
+    <hr>
+    <h3>Adresă (necesară pentru e-Factura)</h3>
+
+    <div class="field">
+      <label for="addressStreet">Stradă și număr</label>
+      <input id="addressStreet" type="text" formControlName="addressStreet" placeholder="Str. Exemplu nr. 10">
+    </div>
+
+    <div class="field">
+      <label for="addressCity">Localitate</label>
+      <input id="addressCity" type="text" formControlName="addressCity">
+    </div>
+
+    <div class="field">
+      <label for="addressCounty">Județ (cod NUTS)</label>
+      <input id="addressCounty" type="text" formControlName="addressCounty" placeholder="ex: RO-MH pentru Mehedinți">
+    </div>
+
+    <div class="field">
+      <label for="addressPostalCode">Cod poștal</label>
+      <input id="addressPostalCode" type="text" formControlName="addressPostalCode">
+    </div>
+
+    <div class="field">
+      <label for="addressCountry">Țară</label>
+      <input id="addressCountry" type="text" formControlName="addressCountry">
+    </div>
+
+    <div class="field">
+      <label for="iban">IBAN</label>
+      <input id="iban" type="text" formControlName="iban" placeholder="RO00XXXX0000000000000000">
+    </div>
+
     @if (error) {
       <p class="error">{{ error }}</p>
     }

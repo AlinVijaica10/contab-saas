@@ -1,0 +1,178 @@
+.integrations-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  color: #1e2a38;
+}
+
+.page-header .hint {
+  margin: 0;
+  color: #6b7684;
+  font-size: 14px;
+}
+
+.loading-state {
+  padding: 48px 0;
+  text-align: center;
+  color: #6b7684;
+  font-size: 14px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.integration-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.integration-card.placeholder {
+  background: #fafbfc;
+  border: 1px dashed #d5d9de;
+  box-shadow: none;
+}
+
+.card-header {
+  display: flex;
+  gap: 12px;
+  padding: 20px 20px 16px;
+}
+
+.card-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.card-header h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  color: #1e2a38;
+}
+
+.card-subtitle {
+  margin: 0;
+  font-size: 12.5px;
+  color: #8a919b;
+  line-height: 1.4;
+}
+
+.card-body {
+  padding: 0 20px 16px;
+  flex: 1;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.status-row.connected {
+  color: #1e8e5a;
+}
+
+.status-row.disconnected {
+  color: #9aa2ac;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.status-detail {
+  font-weight: 400;
+  color: #6b7684;
+}
+
+.test-email-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.test-email-row input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #dde1e6;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.test-email-row input:focus {
+  outline: none;
+  border-color: #4a9eff;
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.15);
+}
+
+.test-email-row button {
+  background-color: #1e2a38;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.test-email-row button:disabled {
+  background-color: #c7ccd3;
+  cursor: not-allowed;
+}
+
+.card-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #eef0f2;
+  background: #fafbfc;
+}
+
+.card-footer button {
+  width: 100%;
+  background-color: #1e2a38;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.card-footer button:hover {
+  background-color: #2a3a4d;
+}
+
+.status-message {
+  font-size: 12.5px;
+  font-weight: 500;
+  margin: 8px 0 0;
+}
+
+.status-message.success {
+  color: #1e8e5a;
+}
+
+.status-message.error {
+  color: #c0392b;
+}

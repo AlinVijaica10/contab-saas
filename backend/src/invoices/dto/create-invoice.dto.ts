@@ -50,4 +50,12 @@ export class CreateInvoiceDto {
   @ValidateNested({ each: true })
   @Type(() => InvoiceItemDto)
   items: InvoiceItemDto[];
+
+  @IsInt()
+  @IsOptional()
+  recurringMonth?: number;
+
+  @IsInt()
+  @IsOptional()
+  recurringYear?: number;
 }

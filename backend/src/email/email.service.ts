@@ -5,9 +5,13 @@ export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private readonly apiKey = process.env.BREVO_API_KEY;
   private readonly senderEmail = process.env.BREVO_SENDER_EMAIL;
-  private readonly senderName = process.env.BREVO_SENDER_NAME ?? 'ContaSaaS';
+  private readonly senderName = process.env.BREVO_SENDER_NAME ?? 'VJA Conta';
 
-  async sendEmail(to: string, subject: string, htmlContent: string): Promise<boolean> {
+  async sendEmail(
+    to: string,
+    subject: string,
+    htmlContent: string,
+  ): Promise<boolean> {
     if (!this.apiKey) {
       this.logger.error('BREVO_API_KEY nu este configurat.');
       return false;

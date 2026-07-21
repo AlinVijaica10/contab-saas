@@ -15,6 +15,18 @@ model Tenant {
   email            String
   subscriptionPlan String   @default("trial")
   createdAt        DateTime @default(now())
+
+  // Adresă sediu - obligatoriu pentru e-Factura (furnizor)
+  addressStreet    String?
+  addressCity      String?
+  addressCounty    String?  // cod NUTS, ex: "RO-MH" pentru Mehedinți
+  addressPostalCode String?
+  addressCountry   String   @default("RO")
+
+  // Cont bancar - pentru modalitate de plată pe factură
+  iban             String?
+  bankName         String?
+
   users            User[]
   clients          Client[]
   invoiceSeries    InvoiceSeries[]
@@ -22,7 +34,8 @@ model Tenant {
   documents         Document[]
   clientUploadLinks ClientUploadLink[]
   declarationSubmissions DeclarationSubmission[]
-   documentRequestLogs DocumentRequestLog[]
+  documentRequestLogs DocumentRequestLog[]
+  anafCredential AnafCredential?
 }
 
 model User {
@@ -48,24 +61,31 @@ model Client {
   createdAt      DateTime        @default(now())
   phoneNumber String?
 
-
   clientType     ClientType      @default(SRL)
   fiscalRegime   FiscalRegime    @default(MICRO)
   isVatPayer     Boolean         @default(false)
   vatPeriodicity VatPeriodicity?
   hasEmployees   Boolean         @default(false)
 
+  // Adresă - obligatoriu pentru e-Factura (client/beneficiar)
+  addressStreet     String?
+  addressCity       String?
+  addressCounty     String?   // cod NUTS, ex: "RO-MH"
+  addressPostalCode String?
+  addressCountry    String    @default("RO")
+
+  iban              String?
+
   invoices           Invoice[]
   documents          Document[]
   uploadLink         ClientUploadLink?
   declarationSubmissions DeclarationSubmission[]
 
-   monthlyFee            Decimal? @db.Decimal(12, 2)
-   monthlyFeeVatRate      Decimal? @db.Decimal(5, 2) @default(0)
-   monthlyFeeDescription String?  @default("Servicii de contabilitate")
+  monthlyFee            Decimal? @db.Decimal(12, 2)
+  monthlyFeeVatRate      Decimal? @db.Decimal(5, 2) @default(0)
+  monthlyFeeDescription String?  @default("Servicii de contabilitate")
 
-   documentRequestLogs DocumentRequestLog[]
-
+  documentRequestLogs DocumentRequestLog[]
 }
 
 model InvoiceSeries {
@@ -98,6 +118,7 @@ model Invoice {
   currency  String    @default("RON")
 
   status    InvoiceStatus @default(DRAFT)
+  documentType InvoiceDocumentType @default(NORMAL) // NORMAL sau STORNO (credit note)
 
   subtotal  Decimal   @db.Decimal(12, 2)
   vatTotal  Decimal   @db.Decimal(12, 2)
@@ -111,6 +132,22 @@ model Invoice {
   updatedAt DateTime  @updatedAt
 
   @@unique([seriesId, number])
+
+  anafUploadIndex  String?
+  anafStatus       AnafStatus?
+  anafSentAt       DateTime?
+  anafErrorMessage String?
+  anafDownloadId   String?
+
+  recurringMonth   Int?
+  recurringYear    Int?
+
+  @@unique([clientId, recurringMonth, recurringYear])
+}
+
+enum InvoiceDocumentType {
+  NORMAL
+  STORNO
 }
 
 model InvoiceItem {
@@ -120,8 +157,10 @@ model InvoiceItem {
 
   description String
   quantity    Decimal  @db.Decimal(10, 2)
+  unitOfMeasure String @default("H87") // cod UN/ECE - H87=bucată, KGM=kg, HUR=oră, MTR=metru, LTR=litru
   unitPrice   Decimal  @db.Decimal(12, 2)
   vatRate     Decimal  @db.Decimal(5, 2) @default(19)
+  vatExemptionReason String? // obligatoriu dacă vatRate = 0 (ex: "Scutit conform art. 292 Cod Fiscal")
 
   lineTotal   Decimal  @db.Decimal(12, 2)
 }
@@ -131,6 +170,13 @@ enum InvoiceStatus {
   ISSUED
   PAID
   CANCELLED
+}
+
+enum AnafStatus {
+  PENDING
+  PROCESSING
+  OK
+  ERROR
 }
 
 model Document {
@@ -238,4 +284,17 @@ model DocumentRequestLog {
   requestedAt DateTime @default(now())
   emailSent  Boolean
   status     String
+}
+
+model AnafCredential {
+  id           Int      @id @default(autoincrement())
+  tenantId     Int      @unique
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+
+  accessToken  String   @db.Text
+  refreshToken String   @db.Text
+  expiresAt    DateTime
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

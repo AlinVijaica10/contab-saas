@@ -35,6 +35,12 @@ export interface Invoice {
     prefix: string;
     year: number;
   };
+
+  anafStatus?: 'PENDING' | 'PROCESSING' | 'OK' | 'ERROR' | null;
+  anafUploadIndex?: string | null;
+  anafSentAt?: string | null;
+
+  anafDownloadId?: string | null;
 }
 
 export interface CreateInvoicePayload {

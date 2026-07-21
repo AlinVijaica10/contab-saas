@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { InvoiceService, Invoice, GenerateMonthlyResult } from '../../services/invoice';
+import { AnafService, AnafStatus } from '../../services/anaf';
 
 @Component({
   selector: 'app-invoice-list',
@@ -17,6 +18,9 @@ export class InvoiceList implements OnInit {
 
   generating = signal(false);
   generationResults = signal<GenerateMonthlyResult[] | null>(null);
+
+  anafStatus = signal<AnafStatus | null>(null);
+  sendingInvoiceId = signal<number | null>(null);
 
   selectedMonth: number;
   selectedYear: number;
@@ -41,7 +45,10 @@ export class InvoiceList implements OnInit {
 
   years: number[] = [];
 
-  constructor(private invoiceService: InvoiceService) {
+  constructor(
+    private invoiceService: InvoiceService,
+    private anafService: AnafService,
+  ) {
     const now = new Date();
     const prevMonth = now.getMonth() === 0 ? 12 : now.getMonth();
     const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
@@ -55,6 +62,7 @@ export class InvoiceList implements OnInit {
 
   ngOnInit(): void {
     this.loadInvoices();
+    this.anafService.getStatus().subscribe((status) => this.anafStatus.set(status));
   }
 
   loadInvoices(): void {
@@ -133,6 +141,32 @@ export class InvoiceList implements OnInit {
     });
   }
 
+  connectAnaf(): void {
+    this.anafService.connect();
+  }
+
+  sendToAnaf(invoice: Invoice): void {
+    this.sendingInvoiceId.set(invoice.id);
+    this.anafService.sendInvoice(invoice.id).subscribe({
+      next: () => {
+        alert('Factura a fost trimisă la ANAF. Verifică statusul în câteva minute.');
+        this.sendingInvoiceId.set(null);
+        this.loadInvoices(); // presupune că ai deja o metodă de reîncărcare; ajustează numele dacă diferă
+      },
+      error: (err) => {
+        alert('Eroare la trimiterea facturii: ' + (err?.error?.message ?? err.message));
+        this.sendingInvoiceId.set(null);
+      },
+    });
+  }
+
+  checkAnafStatus(invoice: Invoice): void {
+    this.anafService.checkInvoiceStatus(invoice.id).subscribe({
+      next: (res) => alert('Stare ANAF: ' + JSON.stringify(res, null, 2)),
+      error: (err) => alert('Eroare: ' + (err?.error?.message ?? err.message)),
+    });
+  }
+
   downloadPdf(id: number): void {
     this.invoiceService.downloadPdf(id).subscribe({
       next: (blob) => {
@@ -148,5 +182,9 @@ export class InvoiceList implements OnInit {
         console.error(err);
       },
     });
+  }
+
+  downloadAnafResponse(invoice: Invoice): void {
+    this.anafService.downloadResponse(invoice.id);
   }
 }

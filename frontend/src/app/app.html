@@ -2,7 +2,7 @@
   @if (authService.isAuthenticated()) {
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h1>ContaSaaS</h1>
+        <h1>VJA Conta</h1>
       </div>
 
       <nav class="sidebar-nav">
@@ -31,7 +31,19 @@
             <span class="nav-icon">➕</span> Factură nouă
           </a>
         </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Setări</span>
+          <a routerLink="/settings/company" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">🏢</span> Datele firmei
+          </a>
+          <a routerLink="/settings/integrations" routerLinkActive="active" class="nav-link">
+            <span class="nav-icon">🔌</span> Integrări
+          </a>
+        </div>
       </nav>
+
+
 
       <div class="sidebar-footer">
         <button (click)="logout()" class="logout-btn">

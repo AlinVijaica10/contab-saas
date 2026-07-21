@@ -37,6 +37,12 @@ export class ClientForm implements OnInit {
       monthlyFee: [null],
       monthlyFeeVatRate: [0],
       monthlyFeeDescription: ['Servicii de contabilitate'],
+      addressStreet: [''],
+      addressCity: [''],
+      addressCounty: [''],
+      addressPostalCode: [''],
+      addressCountry: ['RO'],
+      iban: [''],
     });
 
     this.form.get('clientType')?.valueChanges.subscribe((type) => {

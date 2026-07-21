@@ -1,0 +1,89 @@
+<div class="company-settings">
+  <div class="page-header">
+    <h2>Setări firmă</h2>
+    <p class="hint">Aceste date apar pe facturile trimise către e-Factura (ANAF) ca furnizor.</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">Se încarcă...</div>
+  }
+
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="settings-card">
+
+        <div class="settings-section">
+          <h3 class="section-title"><span class="section-icon">🏢</span> Date generale</h3>
+          <div class="field-grid">
+            <div class="field full">
+              <label for="name">Denumire firmă</label>
+              <input id="name" type="text" formControlName="name">
+            </div>
+            <div class="field">
+              <label for="cui">CUI</label>
+              <input id="cui" type="text" formControlName="cui" placeholder="ex: 42997491 sau RO42997491">
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" formControlName="email">
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title"><span class="section-icon">📍</span> Adresă — necesară pentru e-Factura</h3>
+          <div class="field-grid">
+            <div class="field full">
+              <label for="addressStreet">Stradă și număr</label>
+              <input id="addressStreet" type="text" formControlName="addressStreet">
+            </div>
+            <div class="field">
+              <label for="addressCity">Localitate</label>
+              <input id="addressCity" type="text" formControlName="addressCity">
+            </div>
+            <div class="field">
+              <label for="addressCounty">Județ (cod NUTS)</label>
+              <input id="addressCounty" type="text" formControlName="addressCounty" placeholder="ex: RO-MH">
+            </div>
+            <div class="field">
+              <label for="addressPostalCode">Cod poștal</label>
+              <input id="addressPostalCode" type="text" formControlName="addressPostalCode">
+            </div>
+            <div class="field">
+              <label for="addressCountry">Țară</label>
+              <input id="addressCountry" type="text" formControlName="addressCountry">
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title"><span class="section-icon">🏦</span> Cont bancar — opțional</h3>
+          <div class="field-grid">
+            <div class="field">
+              <label for="iban">IBAN</label>
+              <input id="iban" type="text" formControlName="iban" placeholder="RO00XXXX0000000000000000">
+            </div>
+            <div class="field">
+              <label for="bankName">Bancă</label>
+              <input id="bankName" type="text" formControlName="bankName">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" [disabled]="submitting()">
+            {{ submitting() ? 'Se salvează...' : 'Salvează' }}
+          </button>
+
+          @if (error()) {
+            <span class="status-message error">⚠ {{ error() }}</span>
+          }
+          @if (success()) {
+            <span class="status-message success">✓ Salvat cu succes</span>
+          }
+        </div>
+
+      </div>
+    </form>
+  }
+</div>

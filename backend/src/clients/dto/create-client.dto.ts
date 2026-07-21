@@ -86,4 +86,28 @@ export class CreateClientDto {
   @IsString()
   @IsOptional()
   phoneNumber?: string;
+
+  @IsString()
+  @IsOptional()
+  addressStreet?: string;
+
+  @IsString()
+  @IsOptional()
+  addressCity?: string;
+
+  @IsString()
+  @IsOptional()
+  addressCounty?: string;
+
+  @IsString()
+  @IsOptional()
+  addressPostalCode?: string;
+
+  @IsString()
+  @IsOptional()
+  addressCountry?: string;
+
+  @IsString()
+  @IsOptional()
+  iban?: string;
 }
