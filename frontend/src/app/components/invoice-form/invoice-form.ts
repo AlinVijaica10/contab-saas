@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { InvoiceService } from '../../services/invoice';
 import { ClientService, Client } from '../../services/client';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-invoice-form',
@@ -19,12 +21,14 @@ export class InvoiceForm implements OnInit {
   isEditMode = false;
   invoiceId: number | null = null;
   isReady = signal(false);
+  defaultVatRate = 19;
 
   constructor(
     private fb: FormBuilder,
     private invoiceService: InvoiceService,
     private clientService: ClientService,
     private router: Router,
+    private http: HttpClient,
     private route: ActivatedRoute,
   ) {
     this.form = this.fb.group({
@@ -79,8 +83,26 @@ export class InvoiceForm implements OnInit {
         },
       });
     } else {
-      this.items.push(this.createItemGroup());
-      this.isReady.set(true);
+      this.http.get<any>(`${environment.apiUrl}/tenant/me`).subscribe({
+        next: (tenant) => {
+          this.defaultVatRate = tenant.invoiceDefaultVatRate ?? 19;
+
+          const dueDate = new Date();
+          dueDate.setDate(dueDate.getDate() + (tenant.invoiceDueDays ?? 30));
+
+          this.form.patchValue({
+            dueDate: dueDate.toISOString().substring(0, 10),
+            notes: tenant.invoiceDefaultNote ?? '',
+          });
+
+          this.items.push(this.createItemGroup());
+          this.isReady.set(true);
+        },
+        error: () => {
+          this.items.push(this.createItemGroup());
+          this.isReady.set(true);
+        },
+      });
     }
   }
 
@@ -93,7 +115,7 @@ export class InvoiceForm implements OnInit {
       description: ['', Validators.required],
       quantity: [1, [Validators.required, Validators.min(0.01)]],
       unitPrice: [0, [Validators.required, Validators.min(0)]],
-      vatRate: [19, [Validators.required, Validators.min(0)]],
+      vatRate: [this.defaultVatRate, [Validators.required, Validators.min(0)]],
     });
   }
 

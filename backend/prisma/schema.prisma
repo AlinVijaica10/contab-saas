@@ -27,6 +27,10 @@ model Tenant {
   iban             String?
   bankName         String?
 
+  documentRequestEmailSubject    String?
+  documentRequestEmailBody       String? @db.Text
+  documentRequestWhatsappMessage String? @db.Text
+
   users            User[]
   clients          Client[]
   invoiceSeries    InvoiceSeries[]
@@ -36,6 +40,18 @@ model Tenant {
   declarationSubmissions DeclarationSubmission[]
   documentRequestLogs DocumentRequestLog[]
   anafCredential AnafCredential?
+
+  brevoApiKey      String?
+  brevoSenderEmail String?
+  brevoSenderName  String?
+
+  invoiceSeriesPrefix   String?  @default("FCT")
+  invoiceDueDays        Int?     @default(30)
+  invoiceDefaultVatRate Decimal? @db.Decimal(5, 2) @default(19)
+  invoiceDefaultNote    String?  @db.Text
+
+  bankNotificationEmail String? @unique
+  bankPayments          BankPayment[]
 }
 
 model User {
@@ -86,6 +102,8 @@ model Client {
   monthlyFeeDescription String?  @default("Servicii de contabilitate")
 
   documentRequestLogs DocumentRequestLog[]
+
+  bankPayments BankPayment[]
 }
 
 model InvoiceSeries {
@@ -143,6 +161,8 @@ model Invoice {
   recurringYear    Int?
 
   @@unique([clientId, recurringMonth, recurringYear])
+
+  bankPayments BankPayment[]
 }
 
 enum InvoiceDocumentType {
@@ -297,4 +317,33 @@ model AnafCredential {
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model BankPayment {
+  id              Int               @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant            @relation(fields: [tenantId], references: [id])
+
+  clientId        Int?
+  client          Client?           @relation(fields: [clientId], references: [id])
+
+  invoiceId       Int?
+  invoice         Invoice?          @relation(fields: [invoiceId], references: [id])
+
+  bankName        String            @default("UniCredit")
+  amount          Decimal           @db.Decimal(12, 2)
+  currency        String            @default("RON")
+  payerName       String?
+  referenceText   String?           @db.Text
+  rawEmailBody    String            @db.Text
+  transactionDate DateTime?
+  receivedAt      DateTime          @default(now())
+
+  status          BankPaymentStatus @default(UNMATCHED)
+}
+
+enum BankPaymentStatus {
+  UNMATCHED
+  MATCHED
+  IGNORED
 }

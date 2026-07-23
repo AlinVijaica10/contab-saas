@@ -17,12 +17,20 @@ export class InvoicesService {
   ) {}
 
   async create(tenantId: number, dto: CreateInvoiceDto) {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+    });
+
     // calculăm totalurile din liniile facturii
     let subtotal = 0;
     let vatTotal = 0;
 
+    const defaultVatRate = tenant?.invoiceDefaultVatRate
+      ? Number(tenant.invoiceDefaultVatRate)
+      : 19;
+
     const items = dto.items.map((item) => {
-      const vatRate = item.vatRate ?? 19;
+      const vatRate = item.vatRate ?? defaultVatRate;
       const lineTotal = item.quantity * item.unitPrice;
       const lineVat = lineTotal * (vatRate / 100);
       subtotal += lineTotal;
@@ -32,10 +40,9 @@ export class InvoicesService {
 
     const total = subtotal + vatTotal;
 
-    // generăm numărul de factură ATOMIC, în afara tranzacției principale de creare
     const { seriesId, number } = await this.numbering.getNextNumber(
       tenantId,
-      dto.seriesPrefix ?? 'FCT',
+      dto.seriesPrefix ?? tenant?.invoiceSeriesPrefix ?? 'FCT',
     );
 
     return this.prisma.forTenant().invoice.create({
@@ -48,13 +55,13 @@ export class InvoicesService {
         subtotal,
         vatTotal,
         total,
-        notes: dto.notes,
+        notes: dto.notes ?? tenant?.invoiceDefaultNote ?? undefined,
         recurringMonth: dto.recurringMonth ?? null,
         recurringYear: dto.recurringYear ?? null,
         items: {
           create: items,
         },
-      } as any, // tenantId injectat automat de forTenant()
+      } as any,
       include: { items: true, client: true, series: true },
     });
   }
@@ -98,6 +105,11 @@ export class InvoicesService {
   ];
 
   async generateMonthlyInvoices(tenantId: number, month: number, year: number) {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+    });
+    const dueDays = tenant?.invoiceDueDays ?? 30;
+
     const clients = await this.prisma.forTenant().client.findMany({
       where: { monthlyFee: { not: null } },
     });
@@ -137,11 +149,15 @@ export class InvoicesService {
       const monthLabel = this.monthNames[month - 1];
       const description = `${client.monthlyFeeDescription ?? 'Servicii de contabilitate'} - ${monthLabel} ${year}`;
 
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + dueDays);
+
       try {
         const invoice = await this.create(tenantId, {
           clientId: client.id,
           recurringMonth: month,
           recurringYear: year,
+          dueDate,
           items: [
             {
               description,
@@ -149,7 +165,9 @@ export class InvoicesService {
               unitPrice: Number(client.monthlyFee),
               vatRate: client.monthlyFeeVatRate
                 ? Number(client.monthlyFeeVatRate)
-                : 19,
+                : tenant?.invoiceDefaultVatRate
+                  ? Number(tenant.invoiceDefaultVatRate)
+                  : 19,
             },
           ],
         });

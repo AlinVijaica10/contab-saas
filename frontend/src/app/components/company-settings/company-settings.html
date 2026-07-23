@@ -70,6 +70,36 @@
           </div>
         </div>
 
+        <div class="settings-section">
+          <h3 class="section-title"><span class="section-icon">🧾</span> Setări facturare</h3>
+          <div class="field-grid">
+            <div class="field">
+              <label for="invoiceSeriesPrefix">Prefix serie factură</label>
+              <input id="invoiceSeriesPrefix" type="text" formControlName="invoiceSeriesPrefix" placeholder="ex: FCT">
+            </div>
+            <div class="field">
+              <label for="invoiceDueDays">Scadență implicită (zile)</label>
+              <input id="invoiceDueDays" type="number" formControlName="invoiceDueDays" min="0">
+            </div>
+            <div class="field">
+              <label for="invoiceDefaultVatRate">Cotă TVA implicită (%)</label>
+              <input id="invoiceDefaultVatRate" type="number" formControlName="invoiceDefaultVatRate" min="0" step="0.01">
+            </div>
+            <div class="field full">
+              <label for="invoiceDefaultNote">Mențiune implicită pe factură</label>
+              <textarea id="invoiceDefaultNote" rows="3" formControlName="invoiceDefaultNote" placeholder="ex: Plata se face prin transfer bancar în contul de mai sus."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title"><span class="section-icon">🏦</span> Notificări plăți bancare</h3>
+          <p class="hint">Configurează în aplicația UniCredit ca notificările de încasare să fie trimise/redirecționate către:</p>
+          <div class="field">
+            <input type="text" [value]="bankNotificationEmail" readonly>
+          </div>
+        </div>
+
         <div class="form-footer">
           <button type="submit" [disabled]="submitting()">
             {{ submitting() ? 'Se salvează...' : 'Salvează' }}

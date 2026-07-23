@@ -12,6 +12,10 @@ import { Dashboard } from './components/dashboard/dashboard';
 import { ClientDeclarations } from './components/client-declarations/client-declarations';
 import { CompanySettings } from './components/company-settings/company-settings';
 import { Integrations } from './components/integrations/integrations';
+import { Help } from './components/help/help';
+import { Templates } from './components/templates/templates';
+import { Payments } from './components/payments/payments';
+import { ClientPayments } from './components/client-payments/client-payments';
 
 
 export const routes: Routes = [
@@ -30,4 +34,8 @@ export const routes: Routes = [
   { path: 'invoices/edit/:id', component: InvoiceForm, canActivate: [authGuard] },
   { path: 'settings/company', component: CompanySettings, canActivate: [authGuard] },
   { path: 'settings/integrations', component: Integrations, canActivate: [authGuard] },
+  { path: 'help', component: Help, canActivate: [authGuard] },
+  { path: 'settings/templates', component: Templates, canActivate: [authGuard] },
+  { path: 'payments', component: Payments, canActivate: [authGuard] },
+  { path: 'clients/:id/payments', component: ClientPayments, canActivate: [authGuard] },
 ];

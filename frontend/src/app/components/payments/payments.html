@@ -1,0 +1,88 @@
+<div class="payments-page">
+  <div class="page-header">
+    <h2>Plăți</h2>
+    <p class="hint">Restanțe pe client și plăți bancare nealocate încă.</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">Se încarcă...</div>
+  }
+
+  @if (!loading()) {
+    <div class="section">
+      <h3>Clienți cu restanțe</h3>
+      @if (outstanding().length === 0) {
+        <p class="empty-state">Niciun client cu restanțe. 🎉</p>
+      }
+      @if (outstanding().length > 0) {
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>Client</th>
+            <th>Facturi neplătite</th>
+            <th>Sumă restantă</th>
+            <th>Din care întârziate</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (row of outstanding(); track row.clientId) {
+              <tr>
+                <td>{{ row.companyName }}</td>
+                <td>{{ row.unpaidInvoiceCount }}</td>
+                <td>{{ row.totalDue | number: '1.2-2' }} RON</td>
+                <td [class.overdue]="row.overdueCount > 0">{{ row.overdueCount }}</td>
+                <td><a [routerLink]="['/clients', row.clientId, 'payments']">Detalii</a></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="section">
+      <h3>Plăți nealocate</h3>
+      @if (unmatched().length === 0) {
+        <p class="empty-state">Nicio plată nealocată.</p>
+      }
+      @if (unmatched().length > 0) {
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>Dată</th>
+            <th>Sumă</th>
+            <th>Plătitor</th>
+            <th>Referință</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (payment of unmatched(); track payment.id) {
+              <tr>
+                <td>{{ payment.transactionDate ? (payment.transactionDate | date: 'dd.MM.yyyy') : '-' }}</td>
+                <td>{{ payment.amount | number: '1.2-2' }} {{ payment.currency }}</td>
+                <td>{{ payment.payerName ?? '-' }}</td>
+                <td>{{ payment.referenceText ?? '-' }}</td>
+                <td>
+                  @if (matchingId !== payment.id) {
+                    <button (click)="startMatching(payment)">Asociază client</button>
+                    <button (click)="ignorePayment(payment)">Ignoră</button>
+                  }
+                  @if (matchingId === payment.id) {
+                    <select [(ngModel)]="selectedClientId">
+                      <option [ngValue]="null">Alege client...</option>
+                      @for (client of clients(); track client.id) {
+                        <option [ngValue]="client.id">{{ client.companyName }}</option>
+                      }
+                    </select>
+                    <button (click)="confirmMatch(payment)">Confirmă</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+</div>

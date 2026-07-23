@@ -14,12 +14,15 @@ class InvoiceItemDto {
   @IsString()
   description: string;
 
+  @Type(() => Number)
   @IsNumber()
   quantity: number;
 
+  @Type(() => Number)
   @IsNumber()
   unitPrice: number;
 
+  @Type(() => Number)
   @IsNumber()
   @IsOptional()
   vatRate?: number = 19;

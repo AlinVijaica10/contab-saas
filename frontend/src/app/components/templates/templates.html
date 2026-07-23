@@ -1,0 +1,54 @@
+<div class="templates-page">
+  <div class="page-header">
+    <h2>Șabloane comunicare</h2>
+    <p class="hint">
+      Personalizează mesajele trimise clienților la solicitarea documentelor lunare.
+      Variabile disponibile: <code>{{ '{{luna}}' }}</code>, <code>{{ '{{an}}' }}</code>,
+      <code>{{ '{{link}}' }}</code>, <code>{{ '{{firma}}' }}</code>.
+    </p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">Se încarcă...</div>
+  }
+
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="settings-card">
+
+        <div class="settings-section">
+          <h3 class="section-title">✉️ Email — solicitare documente</h3>
+          <div class="field">
+            <label for="emailSubject">Subiect</label>
+            <input id="emailSubject" type="text" formControlName="documentRequestEmailSubject">
+          </div>
+          <div class="field">
+            <label for="emailBody">Conținut (HTML)</label>
+            <textarea id="emailBody" rows="6" formControlName="documentRequestEmailBody"></textarea>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="section-title">💬 WhatsApp — solicitare documente</h3>
+          <div class="field">
+            <label for="waMessage">Mesaj</label>
+            <textarea id="waMessage" rows="4" formControlName="documentRequestWhatsappMessage"></textarea>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" [disabled]="submitting()">
+            {{ submitting() ? 'Se salvează...' : 'Salvează' }}
+          </button>
+          @if (error()) {
+            <span class="status-message error">⚠ {{ error() }}</span>
+          }
+          @if (success()) {
+            <span class="status-message success">✓ Salvat cu succes</span>
+          }
+        </div>
+
+      </div>
+    </form>
+  }
+</div>

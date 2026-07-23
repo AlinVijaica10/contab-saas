@@ -12,6 +12,7 @@ import { EmailService } from '../email/email.service';
 import { AnafService } from '../anaf/anaf.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { IsEmail } from 'class-validator';
+import { PrismaService } from '../prisma/prisma.service';
 
 interface AuthenticatedRequest extends ExpressRequest {
   user: { tenantId: number; sub: number; email: string; role: string };
@@ -32,6 +33,7 @@ class TestEmailDto {
 export class IntegrationsController {
   constructor(
     private readonly emailService: EmailService,
+    private readonly prisma: PrismaService,
     private readonly anafService: AnafService,
   ) {}
 
@@ -39,16 +41,23 @@ export class IntegrationsController {
   async status(@Request() req: AuthenticatedRequest) {
     const anaf = await this.anafService.getStatus(req.user.tenantId);
 
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: req.user.tenantId },
+    });
+
+    const senderEmail =
+      tenant?.brevoSenderEmail || process.env.BREVO_SENDER_EMAIL;
+    const senderName = tenant?.brevoSenderName || process.env.BREVO_SENDER_NAME;
+
     return {
       anaf,
       email: {
         configured: Boolean(
-          process.env.BREVO_API_KEY && process.env.BREVO_SENDER_EMAIL,
+          (tenant?.brevoApiKey || process.env.BREVO_API_KEY) && senderEmail,
         ),
-        senderEmail: process.env.BREVO_SENDER_EMAIL ?? null,
-        senderName: process.env.BREVO_SENDER_NAME ?? null,
+        senderEmail: senderEmail ?? null,
+        senderName: senderName ?? null,
       },
-      // adaugi aici alte integrări viitoare (ex: whatsapp, sms) urmând același format
     };
   }
 

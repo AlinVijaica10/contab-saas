@@ -1,5 +1,11 @@
-import { IsString, IsOptional, IsEmail } from 'class-validator';
-
+import {
+  IsString,
+  IsOptional,
+  IsEmail,
+  IsInt,
+  IsNumber,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 export class UpdateTenantDto {
   @IsString()
   @IsOptional()
@@ -40,4 +46,45 @@ export class UpdateTenantDto {
   @IsString()
   @IsOptional()
   bankName?: string;
+
+  @IsString()
+  @IsOptional()
+  documentRequestEmailSubject?: string;
+
+  @IsString()
+  @IsOptional()
+  documentRequestEmailBody?: string;
+
+  @IsString()
+  @IsOptional()
+  documentRequestWhatsappMessage?: string;
+
+  @IsString()
+  @IsOptional()
+  brevoApiKey?: string;
+
+  @IsEmail()
+  @IsOptional()
+  brevoSenderEmail?: string;
+
+  @IsString()
+  @IsOptional()
+  brevoSenderName?: string;
+
+  @IsString()
+  @IsOptional()
+  invoiceSeriesPrefix?: string;
+
+  @IsInt()
+  @IsOptional()
+  invoiceDueDays?: number;
+
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  invoiceDefaultVatRate?: number;
+
+  @IsString()
+  @IsOptional()
+  invoiceDefaultNote?: string;
 }

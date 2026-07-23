@@ -63,9 +63,31 @@
           } @else {
             <div class="status-row disconnected">
               <span class="status-dot"></span>
-              Neconfigurat — verifică BREVO_API_KEY în .env
+              Neconfigurat — completează cheia API mai jos
             </div>
           }
+
+          <div class="brevo-form">
+            <label>Cheie API Brevo</label>
+            <input type="password" [(ngModel)]="brevoApiKey" name="brevoApiKey" placeholder="xkeysib-...">
+
+            <label>Email expeditor</label>
+            <input type="email" [(ngModel)]="brevoSenderEmail" name="brevoSenderEmail" placeholder="contact@firma.ro">
+
+            <label>Nume expeditor</label>
+            <input type="text" [(ngModel)]="brevoSenderName" name="brevoSenderName" placeholder="Firma Contabilitate SRL">
+
+            <button (click)="saveBrevoCredentials()" [disabled]="savingBrevo()">
+              {{ savingBrevo() ? 'Se salvează...' : 'Salvează' }}
+            </button>
+
+            @if (brevoSaved()) {
+              <p class="status-message success">✓ Salvat cu succes</p>
+            }
+            @if (brevoError()) {
+              <p class="status-message error">⚠ {{ brevoError() }}</p>
+            }
+          </div>
 
           <div class="test-email-row">
             <input

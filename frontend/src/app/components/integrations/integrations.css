@@ -176,3 +176,61 @@
 .status-message.error {
   color: #c0392b;
 }
+
+.brevo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.brevo-form label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5561;
+  margin-top: 10px;
+}
+
+.brevo-form label:first-child {
+  margin-top: 0;
+}
+
+.brevo-form input {
+  padding: 8px 10px;
+  border: 1px solid #dde1e6;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.brevo-form input:focus {
+  outline: none;
+  border-color: #4a9eff;
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.15);
+}
+
+.brevo-form button {
+  align-self: flex-start;
+  margin-top: 12px;
+  background-color: #1e2a38;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.brevo-form button:hover {
+  background-color: #2a3a4d;
+}
+
+.brevo-form button:disabled {
+  background-color: #c7ccd3;
+  cursor: not-allowed;
+}
+
+.brevo-form + .test-email-row {
+  padding-top: 16px;
+  border-top: 1px solid #eef0f2;
+}

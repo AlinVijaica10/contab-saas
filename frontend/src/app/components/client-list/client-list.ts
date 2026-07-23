@@ -8,6 +8,9 @@ import {
   RequestMonthlyResult,
 } from '../../services/document';
 import { DatePipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-client-list',
@@ -26,6 +29,9 @@ export class ClientList implements OnInit {
 
   requestHistory = signal<DocumentRequestLogEntry[]>([]);
   showHistory = signal(false);
+
+  whatsappTemplate =
+    'Bună ziua! Vă rugăm să încărcați documentele contabile pentru {{luna}} {{an}} folosind acest link: {{link}}';
 
   categoryStatusLabels: Record<string, string> = {
     requested: 'Solicitat',
@@ -55,6 +61,7 @@ export class ClientList implements OnInit {
   constructor(
     private clientService: ClientService,
     private documentService: DocumentService,
+    private http: HttpClient,
   ) {
     const now = new Date();
     this.selectedMonth = now.getMonth() + 1;
@@ -67,6 +74,14 @@ export class ClientList implements OnInit {
 
   ngOnInit(): void {
     this.loadClients();
+
+    this.http.get<any>(`${environment.apiUrl}/tenant/me`).subscribe({
+      next: (tenant) => {
+        if (tenant.documentRequestWhatsappMessage) {
+          this.whatsappTemplate = tenant.documentRequestWhatsappMessage;
+        }
+      },
+    });
   }
 
   loadClients(): void {
@@ -158,9 +173,17 @@ export class ClientList implements OnInit {
 
   getWhatsAppLink(result: RequestMonthlyResult): string {
     const monthLabel = this.monthNames[this.selectedMonth - 1];
-    const message = `Bună ziua! Vă rugăm să încărcați documentele contabile pentru ${monthLabel} ${this.selectedYear} folosind acest link: ${result.uploadUrl}`;
+    const message = this.renderWhatsappMessage({
+      luna: monthLabel,
+      an: String(this.selectedYear),
+      link: result.uploadUrl ?? '',
+    });
     const phone = (result.phoneNumber ?? '').replace(/[^0-9+]/g, '');
     return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  }
+
+  private renderWhatsappMessage(vars: Record<string, string>): string {
+    return this.whatsappTemplate.replace(/\{\{(\w+)\}\}/g, (_, key) => vars[key] ?? '');
   }
 
   sendWhatsAppDirect(client: Client): void {
@@ -174,7 +197,12 @@ export class ClientList implements OnInit {
         const uploadUrl = `${window.location.origin}/upload/${link.token}`;
         const monthLabel = this.monthNames[new Date().getMonth()];
         const year = new Date().getFullYear();
-        const message = `Bună ziua! Vă rugăm să încărcați documentele contabile pentru ${monthLabel} ${year} folosind acest link: ${uploadUrl}`;
+        const message = this.renderWhatsappMessage({
+          luna: monthLabel,
+          an: String(year),
+          link: uploadUrl,
+          firma: client.companyName,
+        });
         const phone = client.phoneNumber!.replace(/[^0-9+]/g, '');
         const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');

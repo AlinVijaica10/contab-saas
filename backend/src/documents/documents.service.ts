@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from './storage.service';
 import { DocumentCategoryDto } from './dto/upload-document.dto';
 import { EmailService } from '../email/email.service';
+import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class DocumentsService {
@@ -14,8 +15,39 @@ export class DocumentsService {
     private prisma: PrismaService,
     private storage: StorageService,
     private emailService: EmailService,
+    private cls: ClsService,
   ) {}
 
+  private readonly defaultEmailSubject =
+    'Solicitare documente - {{luna}} {{an}}';
+  private readonly defaultEmailBody = `<p>Bună ziua,</p>
+    <p>Vă rugăm să încărcați documentele contabile pentru luna <strong>{{luna}} {{an}}</strong> (facturi, extrase de cont, etc.) folosind linkul de mai jos:</p>
+    <p><a href="{{link}}">{{link}}</a></p>
+    <p>Vă mulțumim!</p>`;
+  private readonly defaultWhatsappMessage =
+    'Bună ziua! Vă rugăm să încărcați documentele contabile pentru {{luna}} {{an}} folosind acest link: {{link}}';
+
+  /** Înlocuiește {{cheie}} cu valorile date - folosit pentru șabloanele de email/WhatsApp per tenant. */
+  private renderTemplate(
+    template: string,
+    vars: Record<string, string>,
+  ): string {
+    return template.replace(/\{\{(\w+)\}\}/g, (_, key) => vars[key] ?? '');
+  }
+
+  private async getTenantTemplates() {
+    const tenantId = this.cls.get('tenantId');
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+    });
+    return {
+      emailSubject:
+        tenant?.documentRequestEmailSubject || this.defaultEmailSubject,
+      emailBody: tenant?.documentRequestEmailBody || this.defaultEmailBody,
+      whatsappMessage:
+        tenant?.documentRequestWhatsappMessage || this.defaultWhatsappMessage,
+    };
+  }
   // --- Partea autentificată (contabilul) ---
 
   async getOrCreateUploadLink(clientId: number) {
@@ -214,17 +246,18 @@ export class DocumentsService {
       ];
       const monthLabel = monthNames[month - 1];
 
-      const emailHtml = `
-      <p>Bună ziua,</p>
-      <p>Vă rugăm să încărcați documentele contabile pentru luna <strong>${monthLabel} ${year}</strong> (facturi, extrase de cont, etc.) folosind linkul de mai jos:</p>
-      <p><a href="${uploadUrl}">${uploadUrl}</a></p>
-      <p>Vă mulțumim!</p>
-    `;
+      const templates = await this.getTenantTemplates();
+      const vars = {
+        luna: monthLabel,
+        an: String(year),
+        link: uploadUrl,
+        firma: client.companyName,
+      };
 
       const emailSent = await this.emailService.sendEmail(
         client.contactEmail,
-        `Solicitare documente - ${monthLabel} ${year}`,
-        emailHtml,
+        this.renderTemplate(templates.emailSubject, vars),
+        this.renderTemplate(templates.emailBody, vars),
       );
 
       results.push({
@@ -273,34 +306,47 @@ export class DocumentsService {
       throw new NotFoundException(`Client with id ${clientId} not found`);
     }
 
-    const link = await this.getOrCreateUploadLink(clientId);
+    const link = await this.getOrCreateUploadLink(client.id);
     const uploadUrl = `${process.env.FRONTEND_URL}/upload/${link.token}`;
 
     const now = new Date();
-    const monthNames = [
-      'Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie',
-      'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie',
-    ];
-    const monthLabel = monthNames[now.getMonth()];
+    const month = now.getMonth() + 1;
     const year = now.getFullYear();
 
-    const emailHtml = `
-    <p>Bună ziua,</p>
-    <p>Vă rugăm să încărcați documentele contabile pentru luna <strong>${monthLabel} ${year}</strong> (facturi, extrase de cont, etc.) folosind linkul de mai jos:</p>
-    <p><a href="${uploadUrl}">${uploadUrl}</a></p>
-    <p>Vă mulțumim!</p>
-  `;
+    const monthNames = [
+      'Ianuarie',
+      'Februarie',
+      'Martie',
+      'Aprilie',
+      'Mai',
+      'Iunie',
+      'Iulie',
+      'August',
+      'Septembrie',
+      'Octombrie',
+      'Noiembrie',
+      'Decembrie',
+    ];
+    const monthLabel = monthNames[month - 1];
+
+    const templates = await this.getTenantTemplates();
+    const vars = {
+      luna: monthLabel,
+      an: String(year),
+      link: uploadUrl,
+      firma: client.companyName,
+    };
 
     const emailSent = await this.emailService.sendEmail(
       client.contactEmail,
-      `Solicitare documente - ${monthLabel} ${year}`,
-      emailHtml,
+      this.renderTemplate(templates.emailSubject, vars),
+      this.renderTemplate(templates.emailBody, vars),
     );
 
     await this.prisma.forTenant().documentRequestLog.create({
       data: {
         clientId,
-        month: now.getMonth() + 1,
+        month,
         year,
         emailSent,
         status: 'requested_manual',

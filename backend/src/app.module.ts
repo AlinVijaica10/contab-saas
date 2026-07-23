@@ -13,6 +13,7 @@ import { AnafModule } from './anaf/anaf.module';
 import { EfacturaModule } from './e-factura/efactura.module';
 import { TenantModule } from './tenant/tenant.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { BankNotificationsModule } from './bank-notifications/bank-notifications.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
     EfacturaModule,
     TenantModule,
     IntegrationsModule,
+    BankNotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

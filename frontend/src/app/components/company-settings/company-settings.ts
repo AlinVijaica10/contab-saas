@@ -15,6 +15,7 @@ export class CompanySettings implements OnInit {
   loading = signal(true);
   error = signal('');
   success = signal(false);
+  bankNotificationEmail = '';
 
   constructor(
     private fb: FormBuilder,
@@ -31,13 +32,18 @@ export class CompanySettings implements OnInit {
       addressCountry: ['RO'],
       iban: [''],
       bankName: [''],
+      invoiceSeriesPrefix: ['FCT'],
+      invoiceDueDays: [30],
+      invoiceDefaultVatRate: [19],
+      invoiceDefaultNote: [''],
     });
   }
 
   ngOnInit(): void {
-    this.http.get(`${this.apiUrl}/me`).subscribe({
+    this.http.get<any>(`${this.apiUrl}/me`).subscribe({
       next: (tenant) => {
         this.form.patchValue(tenant as Record<string, unknown>);
+        this.bankNotificationEmail = tenant.bankNotificationEmail ?? '';
         this.loading.set(false);
       },
       error: (err) => {

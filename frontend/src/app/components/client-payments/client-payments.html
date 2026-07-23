@@ -1,0 +1,49 @@
+<div class="client-payments-page">
+  <a [routerLink]="['/clients', clientId, 'documents']" class="back-link">← Înapoi la {{ clientName() }}</a>
+  <h2>Plăți — {{ clientName() }}</h2>
+
+  @if (loading()) {
+    <div class="loading-state">Se încarcă...</div>
+  }
+
+  @if (!loading()) {
+    <h3>Facturi</h3>
+    <table class="data-table">
+      <thead>
+      <tr><th>Număr</th><th>Emisă</th><th>Scadentă</th><th>Total</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        @for (inv of invoices(); track inv.id) {
+          <tr [class.paid]="inv.status === 'PAID'">
+            <td>{{ inv.number }}</td>
+            <td>{{ inv.issueDate | date: 'dd.MM.yyyy' }}</td>
+            <td>{{ inv.dueDate ? (inv.dueDate | date: 'dd.MM.yyyy') : '-' }}</td>
+            <td>{{ inv.total | number: '1.2-2' }} RON</td>
+            <td>{{ inv.status }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <h3>Plăți primite</h3>
+    @if (payments().length === 0) {
+      <p class="empty-state">Nicio plată înregistrată încă pentru acest client.</p>
+    }
+    @if (payments().length > 0) {
+      <table class="data-table">
+        <thead>
+        <tr><th>Dată</th><th>Sumă</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          @for (p of payments(); track p.id) {
+            <tr>
+              <td>{{ p.receivedAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+              <td>{{ p.amount | number: '1.2-2' }} {{ p.currency }}</td>
+              <td>{{ p.status }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</div>

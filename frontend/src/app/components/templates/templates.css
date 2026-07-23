@@ -1,4 +1,4 @@
-.company-settings {
+.templates-page {
   max-width: 640px;
   margin: 0 auto;
 }
@@ -10,33 +10,41 @@
 .page-header h2 {
   margin: 0 0 6px;
   font-size: 22px;
-  color: #1e2a38;
+  color: var(--ink);
 }
 
 .page-header .hint {
   margin: 0;
-  color: #6b7684;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.5;
+}
+
+.page-header code {
+  background: var(--accent-soft);
+  color: var(--ink);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 13px;
 }
 
 .loading-state {
   padding: 48px 0;
   text-align: center;
-  color: #6b7684;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .settings-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 
 .settings-section {
   padding: 28px 32px;
-  border-bottom: 1px solid #eef0f2;
+  border-bottom: 1px solid var(--border);
 }
 
 .settings-section:last-of-type {
@@ -52,27 +60,18 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #4a9eff;
-}
-
-.section-title .section-icon {
-  font-size: 14px;
-}
-
-.field-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 20px;
-}
-
-.field-grid .field.full {
-  grid-column: 1 / -1;
+  color: var(--accent);
 }
 
 .field {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field:last-child {
+  margin-bottom: 0;
 }
 
 .field label {
@@ -81,31 +80,36 @@
   color: #444;
 }
 
-.field input {
+.field input,
+.field textarea {
   padding: 10px 12px;
-  border: 1px solid #dde1e6;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-family: inherit;
-  color: #1e2a38;
+  color: var(--ink);
   background: #fbfcfd;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  resize: vertical;
 }
 
-.field input:hover {
+.field textarea {
+  font-family: 'Consolas', 'Menlo', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.field input:hover,
+.field textarea:hover {
   border-color: #c7ccd3;
 }
 
-.field input:focus {
+.field input:focus,
+.field textarea:focus {
   outline: none;
-  border-color: #4a9eff;
-  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.15);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(63, 127, 224, 0.15);
   background: white;
-}
-
-.field .field-note {
-  font-size: 12px;
-  color: #9aa2ac;
 }
 
 .form-footer {
@@ -116,43 +120,19 @@
   background: #fafbfc;
 }
 
-.field textarea {
-  padding: 10px 12px;
-  border: 1px solid #dde1e6;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  color: #1e2a38;
-  background: #fbfcfd;
-  resize: vertical;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.field textarea:hover {
-  border-color: #c7ccd3;
-}
-
-.field textarea:focus {
-  outline: none;
-  border-color: #4a9eff;
-  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.15);
-  background: white;
-}
-
 .form-footer button {
-  background-color: #1e2a38;
+  background-color: var(--ink);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 11px 28px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
-.form-footer button:hover {
-  background-color: #2a3a4d;
+.form-footer button:hover:not(:disabled) {
+  background-color: var(--ink-soft);
 }
 
 .form-footer button:disabled {
@@ -163,12 +143,25 @@
 .status-message {
   font-size: 13px;
   font-weight: 500;
-}
-
-.status-message.success {
-  color: #1e8e5a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .status-message.error {
-  color: #c0392b;
+  color: var(--danger);
+}
+
+.status-message.success {
+  color: var(--success);
+}
+
+@media (max-width: 560px) {
+  .settings-section {
+    padding: 20px;
+  }
+  .form-footer {
+    padding: 16px 20px;
+    flex-wrap: wrap;
+  }
 }

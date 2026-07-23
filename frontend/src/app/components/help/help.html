@@ -1,0 +1,95 @@
+<div class="help-page">
+  <div class="page-header">
+    <h2>Documentație integrări</h2>
+    <p class="hint">
+      Ghid tehnic pentru administrator. Cheile de acces (ANAF, Brevo) se configurează în fișierul
+      <code>.env</code> de pe server — un utilizator obișnuit nu le poate schimba din interfață.
+      După orice modificare în <code>.env</code>, serverul backend trebuie repornit.
+    </p>
+  </div>
+
+  <div class="doc-section">
+    <h3 class="ledger-rule">Configurare ANAF — e-Factura</h3>
+
+    <div class="doc-card">
+      <h4>1. Cont de dezvoltator pe portalul ANAF</h4>
+      <ol>
+        <li>Mergi pe <strong>anaf.ro → Servicii Online → Înregistrare utilizatori → Dezvoltatori aplicații</strong>.</li>
+        <li>Alege <strong>„Înregistrare pentru API-uri"</strong> și completează formularul (sau folosește contul SPV existent).</li>
+        <li>Confirmă adresa de email cu codul primit.</li>
+      </ol>
+    </div>
+
+    <div class="doc-card">
+      <h4>2. Înregistrare aplicație OAuth (Client ID / Secret)</h4>
+      <ol>
+        <li>Autentifică-te cu <strong>„Autentificare utilizator"</strong> (user/parolă de dezvoltator, nu certificatul digital).</li>
+        <li>Din meniu, alege <strong>„Editare profil Oauth" → „Gestionare aplicații"</strong>.</li>
+        <li>Completează: denumire aplicație, <strong>Callback URL</strong> (adresa publică a serverului + <code>/anaf/callback</code>), și serviciul <strong>E-Factura</strong>.</li>
+        <li>Apasă <strong>„Generare Client ID"</strong> — salvează imediat Client ID și Client Secret afișate (nu mai apar ulterior).</li>
+      </ol>
+    </div>
+
+    <div class="doc-card">
+      <h4>3. Variabile de mediu (.env, pe server)</h4>
+      <pre>ANAF_CLIENT_ID=...
+ANAF_CLIENT_SECRET=...
+ANAF_REDIRECT_URI=https://domeniul-tau.ro/anaf/callback
+ANAF_AUTH_URL=https://logincert.anaf.ro/anaf-oauth2/v1/authorize
+ANAF_TOKEN_URL=https://logincert.anaf.ro/anaf-oauth2/v1/token
+ANAF_REVOKE_URL=https://logincert.anaf.ro/anaf-oauth2/v1/revoke
+ANAF_EFACTURA_ENV=test</pre>
+      <p class="note">
+        ⚠ <strong>ANAF_EFACTURA_ENV=test</strong> trimite facturile în mediul de testare ANAF (fără efecte reale).
+        Schimbă în <code>production</code> doar când ești sigur că vrei să trimiți facturi reale către clienți.
+        Necesită o <strong>aplicație OAuth separată</strong>, înregistrată cu Callback URL-ul de producție.
+      </p>
+    </div>
+
+    <div class="doc-card">
+      <h4>4. Conectare din aplicație</h4>
+      <ol>
+        <li>Mergi la <strong>Integrări</strong> din meniu.</li>
+        <li>Apasă <strong>„Conectează ANAF"</strong> — te redirecționează către ANAF pentru autentificare cu certificatul digital calificat (tokenul USB trebuie conectat la calculator).</li>
+        <li>După autentificare, ești redirecționat înapoi și cardul ANAF arată „Conectat".</li>
+      </ol>
+      <p class="note">Token-ul de acces expiră la 90 de zile și se reînnoiește automat cât timp refresh token-ul (365 zile) e valid.</p>
+    </div>
+  </div>
+
+  <div class="doc-section">
+    <h3 class="ledger-rule">Configurare Email — Brevo</h3>
+
+    <div class="doc-card">
+      <h4>1. Cont Brevo</h4>
+      <ol>
+        <li>Creează cont pe <strong>brevo.com</strong> (fost Sendinblue).</li>
+        <li>În <strong>Senders, Domains &amp; Dedicated IPs</strong>, adaugă și verifică adresa de email de la care vei trimite (sau domeniul complet, pentru livrabilitate mai bună).</li>
+      </ol>
+    </div>
+
+    <div class="doc-card">
+      <h4>2. Cheia API</h4>
+      <ol>
+        <li>Din contul Brevo: <strong>SMTP &amp; API → API Keys → Generate a new API key</strong>.</li>
+        <li>Copiază cheia generată (începe cu <code>xkeysib-</code>) — nu mai poate fi revăzută ulterior.</li>
+      </ol>
+    </div>
+
+    <div class="doc-card">
+      <h4>3. Variabile de mediu (.env, pe server)</h4>
+      <pre>BREVO_API_KEY=xkeysib-...
+BREVO_SENDER_EMAIL=adresa-verificata@domeniultau.ro
+BREVO_SENDER_NAME=VJA Conta</pre>
+    </div>
+
+    <div class="doc-card">
+      <h4>4. Testare din aplicație</h4>
+      <ol>
+        <li>Mergi la <strong>Integrări</strong> din meniu.</li>
+        <li>Cardul „Email (Brevo)" arată „Configurat" dacă variabilele există.</li>
+        <li>Introdu o adresă de test și apasă <strong>„Trimite test"</strong> — confirmă că emailul chiar ajunge.</li>
+      </ol>
+    </div>
+  </div>
+</div>
